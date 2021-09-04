@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include "lexer/lexer.hpp"
-#include "gmethods/errors.hpp"
+#include "utils/errors.hpp"
 
 int main() {
 	Error *error = new Error("SomeBadException");
