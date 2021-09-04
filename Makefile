@@ -3,8 +3,8 @@ CXXFLAGS = -Wall
 SOURCE_DIR = ./src
 OBJECT_DIR = ./obj
 LEXER_DIR = lexer
-GTYPES_DIR = gtypes
-GMETHODS_DIR = gmethods
+GTYPES_DIR = types
+GMETHODS_DIR = utils
 TARGET = Gurungi
 
 SOURCES_WITHDIR = $(wildcard $(SOURCE_DIR)/$(LEXER_DIR)/*.cpp) $(wildcard $(SOURCE_DIR)/*.cpp)\
