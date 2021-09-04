@@ -4,10 +4,11 @@ SOURCE_DIR = ./src
 OBJECT_DIR = ./obj
 LEXER_DIR = lexer
 GTYPES_DIR = gtypes
+GMETHODS_DIR = gmethods
 TARGET = Gurungi
 
 SOURCES_WITHDIR = $(wildcard $(SOURCE_DIR)/$(LEXER_DIR)/*.cpp) $(wildcard $(SOURCE_DIR)/*.cpp)\
-$(wildcard $(SOURCE_DIR)/$(GTYPES_DIR)/*.cpp)
+$(wildcard $(SOURCE_DIR)/$(GTYPES_DIR)/*.cpp) $(wildcard $(SOURCE_DIR)/$(GMETHODS_DIR)/*.cpp)
 SOURCES = $(notdir $(SOURCES_WITHDIR))
 _OBJECTS = $(SOURCES:.cpp=.o)
 OBJECTS = $(patsubst %.o,$(OBJECT_DIR)/%.o,$(_OBJECTS))
@@ -26,6 +27,10 @@ $(OBJECT_DIR)/%.o : $(SOURCE_DIR)/$(LEXER_DIR)/%.cpp
 	@$(CC) $(CXXFLAGS) -c $< -o $@ -MD
 
 $(OBJECT_DIR)/%.o : $(SOURCE_DIR)/$(GTYPES_DIR)/%.cpp
+	@echo "$(INFO) Making an object file from $< to $@... "
+	@$(CC) $(CXXFLAGS) -c $< -o $@ -MD
+	
+$(OBJECT_DIR)/%.o : $(SOURCE_DIR)/$(GMETHODS_DIR)/%.cpp
 	@echo "$(INFO) Making an object file from $< to $@... "
 	@$(CC) $(CXXFLAGS) -c $< -o $@ -MD
 
