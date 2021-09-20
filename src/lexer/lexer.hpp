@@ -4,3 +4,5 @@
 #include <string>
 #include <cstdlib>
 #include <cctype>
+
+void lexAnalysis(const std::string& filename);

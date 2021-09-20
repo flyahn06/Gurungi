@@ -12,6 +12,7 @@ int main(int argc, char* args[]) {
 	
 	std::cout << filename << " 파일을 인터프릿합니다." << std::endl
 		<< "어휘 분석을 실행하는 중입니다...";
+	lexAnalysis(filename);
 	
 	
 	

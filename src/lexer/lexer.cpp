@@ -19,3 +19,37 @@ void initCharType(){
 	charType['['] = SBRK_1; charType[']'] = SBRK_2;
 	
 }
+
+Token nextToken() {
+	TokenKind kind;
+	int ch0, num = 0;
+	static int ch = ' '; // static 이전문자 유지
+	string text = "";
+	
+	while (isspace(ch)) {ch = nextToken();}
+	if (ch == EOF) return Token(EOF, text);
+	
+	switch(charType[ch]) {
+		case LETTER:
+			while (charType[ch] == LETTER || charType[ch] == DIGIT) {
+				text += ch;
+				ch = nextChar();
+			} break;
+		
+		case DIGIT:
+			while (charType[ch] == DIGIT) {
+				text += ch;
+				ch = nextChar();
+			}
+			num = stoi(text);
+			break;
+			
+	}
+}
+
+TokenKind getKind() {}
+int nextChar() {}
+
+void lexAnalysis(const string& filename) {
+	
+}
