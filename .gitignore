@@ -36,3 +36,7 @@ goorm.manifest
 
 #빌드 관련 설정
 Gurungi
+
+temp.cpp
+test.txt
+.vscode/
