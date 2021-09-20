@@ -1,55 +1,101 @@
 #include "lexer.hpp"
-
-TokenKind charType[256];
+#include "../utils/errors.hpp"
+#include <regex>
 
 using namespace std;
 
-void initCharType(){
-	// CharType 배열을 초기화합니다.
-	int i;
-	
-	for(i=0; i<256; i++)    charType[i]     = OTHERS;
-	for(i='0'; i<='9'; i++) charType[i]     = DIGIT;
-	for(i='A'; i<'Z'; i++)  charType[i]     = LETTER;
-	for(i='a'; i<'z'; i++)  charType[i]     = LETTER;
-	
-	charType['_'] = LETTER;
-	charType['('] = RBRK_1; charType[')'] = RBRK_2;
-	charType['{'] = BRAC_1; charType['}'] = BRAC_2;
-	charType['['] = SBRK_1; charType[']'] = SBRK_2;
-	
-}
 
-Token nextToken() {
+struct Token {
 	TokenKind kind;
-	int ch0, num = 0;
-	static int ch = ' '; // static 이전문자 유지
-	string text = "";
+	std::string text;
+	int intValue;
+	double doubleValue;
 	
-	while (isspace(ch)) {ch = nextToken();}
-	if (ch == EOF) return Token(EOF, text);
-	
-	switch(charType[ch]) {
-		case LETTER:
-			while (charType[ch] == LETTER || charType[ch] == DIGIT) {
-				text += ch;
-				ch = nextChar();
-			} break;
-		
-		case DIGIT:
-			while (charType[ch] == DIGIT) {
-				text += ch;
-				ch = nextChar();
-			}
-			num = stoi(text);
-			break;
-			
+	Token() {
+		kind = OTHERS;
+		text = "";
+		intValue = 0;
 	}
+	Token(TokenKind k, const std::string& s, int d=0) {
+		kind = k;
+		text = s;
+		intValue = 0;
+	}
+	
+};
+
+struct KeyWord {
+	std::string keywordName;
+	TokenKind keywordKind;
+};
+
+KeyWord keyWordTable[] = {
+	{"만약", IF}, {"아니라면", ELSE},
+	{"끝", END}, {"프린트", PRINT},
+	{"(", RBRK_1}, {")", RBRK_2},
+	{"{", BRAC_1}, {"}", BRAC_2},
+	{"[", SBRK_1}, {"]", SBRK_2},
+	{"+", PLUS}, {"-", MINUS},
+	{"*", STAR}, {"/", SLASH},
+	{"=", ASSIGN}, {",", COMMA},
+	{"==", EQUAL}, {"/=", NOTEQUAL},
+	{"<", LESS}, {">", GREAT},
+	{"<=", LESSEQ}, {">=", GREATEQ},
+	{"\"", QUOTE}, {"", END_LIST}
+};
+
+Token token;
+int pointer;
+string source;
+regex regAscii("[a-zA-Z0-9!?@#$%^&*():;+-=~{}<>\\_\\[\\]\\|\\\"\'\\,\\.\\/\\`\\₩]");
+regex regDigit("[0-9]")
+
+bool checkIsSpace(const string& test) {
+    return test == " " || test == "\t" || test == "\n" || test == "\v" || test == "\f" || test == "\r";
 }
 
-TokenKind getKind() {}
-int nextChar() {}
+string getNextChar() {
+    static bool isHangul = false;
+    if (isHangul) {pointer++; pointer++; isHangul = false;}
+    pointer++;
 
-void lexAnalysis(const string& filename) {
-	
+    if (pointer > source.length()) {
+        return Token(EOF_TOKEN, "EOF");
+    }
+    
+    string temp = source.substr(pointer-1, 1);
+    if (regex_match(temp, regAscii) || checkIsSpace(temp)) {
+        return temp;
+    } else {
+        isHangul = true;
+        return source.substr(pointer-1, 3);
+    }
+}
+
+Token analyze() {
+    static string ch0 = "";
+    string ch = getNextChar();
+    string text = ""
+
+    while (checkIsSpace(ch)) ch = getNextChar();
+    
+
+    if (regex_match(ch, regDigit)) {
+        text += ch;
+        while ()
+        
+
+    }
+    
+    return Token();
+}
+
+void lexAnalysis(const string& _source){
+    source = _source;
+    cout << "받은 소스: " << endl
+    << source << endl
+    << "에 대한 어휘 분석을 시작합니다." << endl;
+
+    analyze();
+    
 }
