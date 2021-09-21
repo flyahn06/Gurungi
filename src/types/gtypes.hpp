@@ -1,9 +1,9 @@
 #include <string>
 
 enum TokenKind {
-	RBRK_1='(', RBRK_2=')', BRAC_1 = '{', BRAC_2 = '}', SBRK_1 = '[', SBRK_2 = ']',
+	RBRK_1=1, RBRK_2, BRAC_1, BRAC_2, SBRK_1, SBRK_2,
 	
-	PLUS='+', MINUS='-', STAR='*', SLASH='/',   // 연산자 종류
+	PLUS, MINUS, STAR, SLASH,   // 연산자 종류
 	LESS, LESSEQ, GREAT, GREATEQ, EQUAL, NOTEQUAL,
 	
 	ASSIGN, COMMA, DOT, 
