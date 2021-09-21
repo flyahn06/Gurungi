@@ -40,3 +40,4 @@ Gurungi
 temp.cpp
 test.txt
 .vscode/
+*.log
