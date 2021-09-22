@@ -36,5 +36,5 @@
 // 	{"==", EQUAL}, {"/=", NOTEQUAL},
 // 	{"<", LESS}, {">", GREAT},
 // 	{"<=", LESSEQ}, {">=", GREATEQ},
-// 	{"\"", QUOTE}, {"", END_LIST}
+// 	{"\"", QUOTE}
 // };

@@ -6,11 +6,12 @@ enum TokenKind {
 	PLUS, MINUS, STAR, SLASH,   // 연산자 종류
 	LESS, LESSEQ, GREAT, GREATEQ, EQUAL, NOTEQUAL,
 	
-	ASSIGN, COMMA, DOT, 
+	ASSIGN, COMMA, DOT, QUOTE,
 	
-	IF, ELSE, ELIF, END,
-	
-	PRINT, QUOTE, END_LIST,
+	PRINT,
+	IF, ELSE, ELIF, WHILE, FOR,
+	FUNC,
+	END, 
 	
 	DIGIT, LETTER, INTVALUE, DOUBLEVALUE, // 어휘 분석 시 숫자와 문자로 나누어 분석하기 때문에 필요합니다.
 	
