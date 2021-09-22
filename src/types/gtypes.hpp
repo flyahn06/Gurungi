@@ -1,6 +1,6 @@
 #include <string>
 
-#define KEYCOUNT 23
+#define KEYCOUNT 26
 #ifndef _GTYPES_HPP_
 #define _GTYPES_HPP_
 
@@ -14,8 +14,8 @@ enum TokenKind {
 	
 	PRINT,
 	IF, ELSE, ELIF, WHILE, FOR,
-	FUNC,
-	END, 
+	FUNC, VAR,
+	END,
 	
 	DIGIT, LETTER, INTVALUE, DOUBLEVALUE, // 어휘 분석 시 숫자와 문자로 나누어 분석하기 때문에 필요합니다.
 	
@@ -35,10 +35,10 @@ struct Token {
 		text = "";
 		intValue = 0;
 	}
-	Token(TokenKind k, const std::string& s, int d=0) {
+	Token(TokenKind k, const std::string& s, int d) {
 		kind = k;
 		text = s;
-		intValue = 0;
+		intValue = d;
 	}
 	
 };
@@ -46,6 +46,30 @@ struct Token {
 struct KeyWord {
 	std::string keywordName;
 	TokenKind keywordKind;
+};
+
+enum SymbolKind {
+	noID, varID, functionID, parameterID
+};
+
+enum dataType {
+	noType, intType // 추후 추가 예정
+};
+
+struct SymbolTable {
+	std::string      name;        // 명시한 이름
+	SymbolKind       kind;        // 함수/변수/매개변수
+	dataType         type;        // 가지고 있는 데이터의 타입
+	int              arrayLength; // 배열일 시 길이 기입 (단순변수는 0)
+	short            args;        // 함수일 시 인자 개수 기입
+	int              address;     // 변수/함수의 주소 (global | local index)
+	int              frame;       // 함수일 시 프레임 크기 기입
+	
+	SymbolTable() {
+		clear();
+	}
+	
+	void clear();
 };
 
 #endif
