@@ -1,6 +1,4 @@
-#include <parser.hpp>
-#include "../lexer/lexer.hpp"
-#include "../types/gtypes.hpp"
+#include "parser.hpp"
 
 using namespace std;
 
@@ -13,7 +11,6 @@ vector<int> localVariables;
 vector<Symbol> globalSymbols;
 vector<Symbol> localSymbols;
 
-Token token;
 
 void parseIntercode(const string& filename) {
     resetPointer();
