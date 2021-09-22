@@ -38,6 +38,8 @@ goorm.manifest
 Gurungi
 
 temp.cpp
+test.cpp
 test.txt
 .vscode/
 *.log
+
