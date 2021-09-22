@@ -1,7 +1,9 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include "lexer/lexer.hpp"
 #include "utils/errors.hpp"
+#include "arg_parser/arg_parser.hpp"
 
 using namespace std;
 
