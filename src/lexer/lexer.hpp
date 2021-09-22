@@ -9,7 +9,7 @@
 #include <regex>
 #include "../utils/errors.hpp"
 
-void lexAnalysis(const std::string& filename);
+void initLexAnalysis(const std::string& filename);
+Token analyze();
 void resetPointer();
-
-
+void lexAnalysisDebug();

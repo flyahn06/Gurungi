@@ -2,50 +2,6 @@
 
 
 using namespace std;
-
-// // 토큰 원형
-// struct Token {
-// 	TokenKind kind;
-// 	std::string text;
-// 	int intValue;
-// 	double doubleValue;
-	
-// 	Token() {
-// 		kind = OTHERS;
-// 		text = "";
-// 		intValue = 0;
-// 	}
-// 	Token(TokenKind k, const std::string& s, int d) {
-// 		kind = k;
-// 		text = s;
-// 		intValue = d;
-// 	}
-	
-// };
-
-// // 키워드 정의
-// struct KeyWord {
-// 	std::string keywordName;
-// 	TokenKind keywordKind;
-// };
-
-// // 키워드 목록
-// // 키워드 추가 시 TokenKind, keyWordTable에 모두 추가해야 바르게 동작함
-// KeyWord keyWordTable[] = {
-// 	{"만약", IF}, {"아니라면", ELSE},
-// 	{"끝", END}, {"출력", PRINT},
-// 	{"(", RBRK_1}, {")", RBRK_2},
-// 	{"{", BRAC_1}, {"}", BRAC_2},
-// 	{"[", SBRK_1}, {"]", SBRK_2},
-// 	{"+", PLUS}, {"-", MINUS},
-// 	{"*", STAR}, {"/", SLASH},
-// 	{"=", ASSIGN}, {",", COMMA},
-// 	{"==", EQUAL}, {"/=", NOTEQUAL},
-// 	{"<", LESS}, {">", GREAT},
-// 	{"<=", LESSEQ}, {">=", GREATEQ},
-// 	{"\"", QUOTE}, {"함수", FUNC}
-// };
-
 string source;
 // 현재 소스코드 문자를 가리키는 pointer값입니다.
 long unsigned int pointer = 0;
@@ -53,12 +9,13 @@ long unsigned int pointer = 0;
 // -- 어휘 분석을 위한 정규식 --
 regex regAscii("[a-zA-Z0-9!?@#$%^&*():;+-=~{}<>\\_\\[\\]\\|\\\"\'\\,\\.\\/\\`\\₩]");
 regex regDigit("[0-9]");
-regex regOper("[\\+\\-\\*\\/<>=]");
+regex regOper("(\\+|\\-|\\*|\\/|<|>|=|>=|<=|==)");
+regex regBrac("[\\[\\]\\(\\)\\{\\}]");
 regex regLetter("[a-zA-Z가-힣]");
 
 // 공백 문자인지 확인
 bool checkIsSpace(const string& test) {
-    return test == " " || test == "\t" || test == "\n" || test == "\v" || test == "\f" || test == "\r";
+    return test == " " || test == "\t" || test == "\v" || test == "\f" || test == "\r";
 }
 
 void resetPointer() {
@@ -88,7 +45,7 @@ string getNextChar() {
     // 먼저 한 글자만을 읽어옵니다.
     string temp = source.substr(pointer-1, 1);
 
-    if (regex_match(temp, regAscii) || checkIsSpace(temp)) {
+    if (regex_match(temp, regAscii) || checkIsSpace(temp) || temp == "\n") {
         // 만약 아스키코드나 공백 중 하나라면 (한글이 아니라면) 바로 리턴합니다.
         return temp;
     }
@@ -106,6 +63,7 @@ bool isOperator(const string& test) {
 }
 
 // 분석해 토큰을 리턴하는 함수입니다.
+// 실제로 호출되는 함수입니다.
 Token analyze() {
     static string ch0 = "";  // 이전 문자
     string ch;
@@ -121,17 +79,20 @@ Token analyze() {
     if (ch == "SOURCE_EOF") {
         return Token(EOF_TOKEN, "SOURCE_EOF", 0);
     }
+	
+	if (ch == "\n") {
+		return Token(OTHERS, "↩(새로운 줄)", 0);
+	}
     
     // 숫자가 있는 경우 숫자를 모두 불러와 토큰을 추출합니다.
-    if (regex_match(ch, regDigit)) {
+    else if (regex_match(ch, regDigit)) {
         do {
             text += ch;
             ch = getNextChar();
-        } while(regex_match(ch, regDigit) && ch != "SOURCE_EOF");
+        } while(regex_match(ch, regDigit) && ch != "SOURCE_EOF" && ch != "\n");
 
         ch0 = ch;
-
-        return Token(NUMBER, "", stoi(text));
+        return Token(NUMBER, "NUMBER", stoi(text));
 
     } 
     
@@ -142,7 +103,7 @@ Token analyze() {
         do {
             text += ch;
             ch = getNextChar();
-            if (ch == "SOURCE_EOF") error_exit("어휘분석 오류: \"가 닫히지 않았습니다.");
+            if (ch == "SOURCE_EOF" || ch == "\n") error_exit(LexerError, "\"가 닫히지 않았습니다.");
         } while (ch != "\"");
 
         return Token(STRING, text, 0);
@@ -164,6 +125,10 @@ Token analyze() {
                 ch0 = ch;
             }
         }
+		
+		else if (regex_match(ch, regBrac)) {
+			text += ch;
+		}
         
         else {
             do {
@@ -173,16 +138,31 @@ Token analyze() {
                     ch0 = ch;
                     break;
                 }
-            } while (!checkIsSpace(ch) && !(ch == "SOURCE_EOF"));
+				else if (ch == "\n") {
+					ch0 = ch;
+					break;
+				}
+				
+				else if (regex_match(ch, regBrac)) {
+					ch0 = ch;
+					break;
+				}
+            } while (!checkIsSpace(ch) && !(ch == "SOURCE_EOF" && ch != "\n"));
 
         }
 
-        
-        for (long unsigned int i; i < sizeof(keyWordTable)/sizeof(keyWordTable[0]); i++) {
-            if (text == keyWordTable[i].keywordName) {
-                // cout << text << "\t" << keyWordTable[i].keywordName << endl;
-                return Token(keyWordTable[i].keywordKind, keyWordTable[i].keywordName, 0);
-            }
+        for(int index=0; index < KEYCOUNT; index++) {
+			string name = keyWordTable[index].keywordName;
+			if (name == text) {
+				return Token(keyWordTable[index].keywordKind, name, 0);
+			}
+			// cout << index;
+			// cout << keyWordTable[index].keywordName << " ";
+			// if (text.compare(keyWordTable[index].keywordName)) {
+			// //cout << text << "\t" << keyWordTable[i].keywordName << endl;
+			// return Token(keyWordTable[index].keywordKind, keyWordTable[index].keywordName, 0);
+			// }
+			// cout << "end" << endl;
         }
 
         return Token(IDENTIFIER, text, 0);
@@ -191,17 +171,18 @@ Token analyze() {
 }
 
 // 실제로 호출되는 함수입니다.
-void lexAnalysis(const string& _source){
+void initLexAnalysis(const string& _source){
     source = _source;
     cout << "받은 소스: " << endl
     << source << endl
     << "에 대한 어휘 분석을 시작합니다." << endl;
+}
 
-    cout << "Kind\tText\t\tIntVal" << endl;
+void lexAnalysisDebug() {
+	cout << "Kind\tText\t\tIntVal" << endl;
 
     do {
         token = analyze();
         cout << token.kind << "\t" << token.text << "\t\t" << token.intValue << endl;
     } while (token.kind != EOF_TOKEN);
-    
 }
