@@ -1,12 +1,11 @@
 #include "arg_parser.hpp"
-#include <iostream>
 
 using namespace std;
 
-map<string, string> parseArguments (vector<char*> args) {
+map<string, string> parseArguments (int argc, char* args[]) {
     map<string, string> result;
 
-    for (int i; i < args.size(); i++) {
+    for (int i; i < argc; i++) {
         cout << args[i] << endl;
     }
 
