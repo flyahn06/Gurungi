@@ -3,52 +3,49 @@
 
 using namespace std;
 
-// 토큰 원형
-struct Token {
-	TokenKind kind;
-	std::string text;
-	int intValue;
-	double doubleValue;
+// // 토큰 원형
+// struct Token {
+// 	TokenKind kind;
+// 	std::string text;
+// 	int intValue;
+// 	double doubleValue;
 	
-	Token() {
-		kind = OTHERS;
-		text = "";
-		intValue = 0;
-	}
-	Token(TokenKind k, const std::string& s, int d) {
-		kind = k;
-		text = s;
-		intValue = d;
-	}
+// 	Token() {
+// 		kind = OTHERS;
+// 		text = "";
+// 		intValue = 0;
+// 	}
+// 	Token(TokenKind k, const std::string& s, int d) {
+// 		kind = k;
+// 		text = s;
+// 		intValue = d;
+// 	}
 	
-};
+// };
 
-// 키워드 정의
-struct KeyWord {
-	std::string keywordName;
-	TokenKind keywordKind;
-};
+// // 키워드 정의
+// struct KeyWord {
+// 	std::string keywordName;
+// 	TokenKind keywordKind;
+// };
 
-// 키워드 목록
-// 키워드 추가 시 TokenKind, keyWordTable에 모두 추가해야 바르게 동작함
-KeyWord keyWordTable[] = {
-	{"만약", IF}, {"아니라면", ELSE},
-	{"끝", END}, {"출력", PRINT},
-	{"(", RBRK_1}, {")", RBRK_2},
-	{"{", BRAC_1}, {"}", BRAC_2},
-	{"[", SBRK_1}, {"]", SBRK_2},
-	{"+", PLUS}, {"-", MINUS},
-	{"*", STAR}, {"/", SLASH},
-	{"=", ASSIGN}, {",", COMMA},
-	{"==", EQUAL}, {"/=", NOTEQUAL},
-	{"<", LESS}, {">", GREAT},
-	{"<=", LESSEQ}, {">=", GREATEQ},
-	{"\"", QUOTE}, {"함수", FUNC}
-};
+// // 키워드 목록
+// // 키워드 추가 시 TokenKind, keyWordTable에 모두 추가해야 바르게 동작함
+// KeyWord keyWordTable[] = {
+// 	{"만약", IF}, {"아니라면", ELSE},
+// 	{"끝", END}, {"출력", PRINT},
+// 	{"(", RBRK_1}, {")", RBRK_2},
+// 	{"{", BRAC_1}, {"}", BRAC_2},
+// 	{"[", SBRK_1}, {"]", SBRK_2},
+// 	{"+", PLUS}, {"-", MINUS},
+// 	{"*", STAR}, {"/", SLASH},
+// 	{"=", ASSIGN}, {",", COMMA},
+// 	{"==", EQUAL}, {"/=", NOTEQUAL},
+// 	{"<", LESS}, {">", GREAT},
+// 	{"<=", LESSEQ}, {">=", GREATEQ},
+// 	{"\"", QUOTE}, {"함수", FUNC}
+// };
 
-
-
-Token token;
 string source;
 // 현재 소스코드 문자를 가리키는 pointer값입니다.
 long unsigned int pointer = 0;

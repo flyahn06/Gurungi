@@ -6,8 +6,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include "../utils/errors.hpp"
 #include <regex>
+#include "../utils/errors.hpp"
 
 void lexAnalysis(const std::string& filename);
 void resetPointer();
