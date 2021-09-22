@@ -1,6 +1,5 @@
 #include "lexer.hpp"
-#include "../utils/errors.hpp"
-#include <regex>
+
 
 using namespace std;
 
@@ -26,7 +25,7 @@ struct Token {
 
 // 키워드 정의
 struct KeyWord {
-	string keywordName;
+	std::string keywordName;
 	TokenKind keywordKind;
 };
 
@@ -44,12 +43,15 @@ KeyWord keyWordTable[] = {
 	{"==", EQUAL}, {"/=", NOTEQUAL},
 	{"<", LESS}, {">", GREAT},
 	{"<=", LESSEQ}, {">=", GREATEQ},
-	{"\"", QUOTE}
+	{"\"", QUOTE}, {"함수", FUNC}
 };
+
 
 
 Token token;
 string source;
+// 현재 소스코드 문자를 가리키는 pointer값입니다.
+long unsigned int pointer = 0;
 
 // -- 어휘 분석을 위한 정규식 --
 regex regAscii("[a-zA-Z0-9!?@#$%^&*():;+-=~{}<>\\_\\[\\]\\|\\\"\'\\,\\.\\/\\`\\₩]");
@@ -62,6 +64,10 @@ bool checkIsSpace(const string& test) {
     return test == " " || test == "\t" || test == "\n" || test == "\v" || test == "\f" || test == "\r";
 }
 
+void resetPointer() {
+    pointer = 0;
+}
+
 // 전체 소스에서 다음 문자를 가져옵니다.
 // return: character(string)
 // 한글일 시 자동으로 3바이트, 다른 문자일 시 1바이트를 읽어 리턴합니다.
@@ -71,9 +77,7 @@ string getNextChar() {
     // false인 경우: pointer값 1증가
     // true인 경우: pointer값 3증가 (한글이 3바이트이므로)
     static bool isHangul = false;
-
-    // 현재 소스코드 문자를 가리키는 pointer값입니다.
-    static int pointer = 0;
+    
 
     // cout << "PTR:" << pointer << endl;
     if (isHangul) {pointer++; pointer++; isHangul = false;}
@@ -177,7 +181,7 @@ Token analyze() {
         }
 
         
-        for (int i; i < sizeof(keyWordTable)/sizeof(keyWordTable[0]); i++) {
+        for (long unsigned int i; i < sizeof(keyWordTable)/sizeof(keyWordTable[0]); i++) {
             if (text == keyWordTable[i].keywordName) {
                 // cout << text << "\t" << keyWordTable[i].keywordName << endl;
                 return Token(keyWordTable[i].keywordKind, keyWordTable[i].keywordName, 0);
