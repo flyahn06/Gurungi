@@ -7,12 +7,13 @@ LEXER_DIR = lexer
 GTYPES_DIR = types
 GMETHODS_DIR = utils
 PARSER_DIR = parser
+STATIC_ANALYSIS_DIR = static_code_analysis
 
 TARGET = Gurungi
 
 SOURCES_WITHDIR = $(wildcard $(SOURCE_DIR)/$(LEXER_DIR)/*.cpp) $(wildcard $(SOURCE_DIR)/*.cpp)\
 $(wildcard $(SOURCE_DIR)/$(GTYPES_DIR)/*.cpp) $(wildcard $(SOURCE_DIR)/$(GMETHODS_DIR)/*.cpp) \
-$(wildcard $(SOURCE_DIR)/$(PARSER_DIR)/*.cpp)
+$(wildcard $(SOURCE_DIR)/$(PARSER_DIR)/*.cpp) $(wildcard $(SOURCE_DIR)/$(STATIC_ANALYSIS_DIR)/*.cpp)
 SOURCES = $(notdir $(SOURCES_WITHDIR))
 _OBJECTS = $(SOURCES:.cpp=.o)
 OBJECTS = $(patsubst %.o,$(OBJECT_DIR)/%.o,$(_OBJECTS))
@@ -38,6 +39,10 @@ $(OBJECT_DIR)/%.o : $(SOURCE_DIR)/$(GTYPES_DIR)/%.cpp
 	@$(CC) $(CXXFLAGS) -c $< -o $@ -MD
 	
 $(OBJECT_DIR)/%.o : $(SOURCE_DIR)/$(GMETHODS_DIR)/%.cpp
+	@echo "$(INFO) Making an object file from $< to $@... "
+	@$(CC) $(CXXFLAGS) -c $< -o $@ -MD
+	
+$(OBJECT_DIR)/%.o : $(SOURCE_DIR)/$(STATIC_ANALYSIS_DIR)/%.cpp
 	@echo "$(INFO) Making an object file from $< to $@... "
 	@$(CC) $(CXXFLAGS) -c $< -o $@ -MD
 
