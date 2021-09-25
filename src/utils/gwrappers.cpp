@@ -12,9 +12,38 @@ int Gstack::size() {
 double Gstack::pop() {
 	if (operandStack.empty()) {
 		error_exit("Operandstack underflow!");
+	}
 
 	double data = operandStack.top();
 	operandStack.pop();
 	return data;
-	}
+	
+}
+
+void GMemory::auto_resize(int n) {
+
+}
+
+void GMemory::set(int address, double data) {
+
+}
+
+void GMemory::add(int address, double data) {
+
+}
+
+double GMemory::get(int address) {
+
+}
+
+int GMemory::size() {
+	return this->memory.size();
+}
+
+void GMemory::push_back (double d) {
+	this->memory.push_back(d);
+}
+
+void GMemory::resize(int size) {
+	this->memory.resize(size);
 }

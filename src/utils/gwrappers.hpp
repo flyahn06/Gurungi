@@ -12,6 +12,7 @@ class Gstack{
 		double pop();
 };
 
+
 class GMemory{
 	private:
 		std::vector<double>memory;
@@ -23,4 +24,5 @@ class GMemory{
 		double get(int address);
 		int size();
 		void push_back(double d);
+		void resize(int size);
 };
