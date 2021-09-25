@@ -5,6 +5,7 @@ using namespace std;
 string source;
 // 현재 소스코드 문자를 가리키는 pointer값입니다.
 long unsigned int pointer = 0;
+int line = 1;
 
 // -- 어휘 분석을 위한 정규식 --
 regex regAscii("[a-zA-Z0-9!?@#$%^&*():;+-=~{}<>\\_\\[\\]\\|\\\"\'\\,\\.\\/\\`\\₩]");
@@ -18,8 +19,13 @@ bool checkIsSpace(const string& test) {
     return test == " " || test == "\t" || test == "\v" || test == "\f" || test == "\r";
 }
 
+int getCurrentLineNumber() {
+    return line;
+}
+
 void resetPointer() {
     pointer = 0;
+    line = 1;
 }
 
 // 전체 소스에서 다음 문자를 가져옵니다.
@@ -81,6 +87,7 @@ Token analyze() {
     }
 	
 	if (ch == "\n") {
+        line++;
 		return Token(OTHERS, "↩(새로운 줄)", 0);
 	}
     

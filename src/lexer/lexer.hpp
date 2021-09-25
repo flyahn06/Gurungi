@@ -13,3 +13,4 @@ void initLexAnalysis(const std::string& filename);
 Token analyze();
 void resetPointer();
 void lexAnalysisDebug();
+int getCurrentLineNumber();
