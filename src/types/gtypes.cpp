@@ -1,5 +1,7 @@
 #include "gtypes.hpp"
 
+using namespace std;
+
 KeyWord keyWordTable[] = {
 	{"만약", IF}, {"아니라면", ELSE},
 	{"끝", END}, {"출력", PRINT},
@@ -24,6 +26,17 @@ void SymbolTable::clear() {
 	args = 0;
 	address = 0;
 	frame = 0;
+}
+
+void SymbolTable::printElements() {
+	cout
+	<< "name: " << name << endl
+	<< "kind: " << kind << endl
+	<< "type: " << type << endl
+	<< "arrayLength: " << arrayLength << endl
+	<< "args: " << args << endl
+	<< "address: " << address << endl
+	<< "frame: " << frame << endl;
 }
 
 Token token;

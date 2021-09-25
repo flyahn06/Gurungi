@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 
 #define KEYCOUNT 26
 #ifndef _GTYPES_HPP_
@@ -49,7 +50,7 @@ struct KeyWord {
 };
 
 enum SymbolKind {
-	noID, varID, functionID, parameterID
+	noID, variableID, functionID, parameterID
 };
 
 enum dataType {
@@ -70,6 +71,7 @@ struct SymbolTable {
 	}
 	
 	void clear();
+	void printElements();
 };
 
 #endif
