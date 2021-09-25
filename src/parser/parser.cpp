@@ -10,6 +10,8 @@ GMemory DMemory;
 vector<string> intercode;
 SymbolTable currentSymTbl;
 
+// 주석작성 refactoring
+
 bool isProcessingFunction = false;
 int localAddress = 0;
 
