@@ -6,6 +6,7 @@ vector<int> globalVariables;
 vector<int> localVariables;
 vector<SymbolTable> globalSymbols;
 vector<SymbolTable> localSymbols;
+vector<SymbolTable> blockSymbols;
 GMemory DMemory;
 vector<string> intercode;
 SymbolTable currentSymTbl;
@@ -14,6 +15,7 @@ SymbolTable currentSymTbl;
 
 bool isProcessingFunction = false;
 int localAddress = 0;
+
 
 
 // 함수의 이름을 등록하는 함수입니다. 키워드 "함수" 뒤에 함수 이름이 나오지 않으면 오류를 발생시킵니다.
@@ -48,11 +50,48 @@ bool is_localname(const string& name, SymbolKind kind) {
 // G/L symbols 안에서 주어진 이름을 검색합니다.
 // 찾으면: -1 이외의 모든 값 (예외발생)
 // 찾지 못하면: -1 (정상)
-int searchName(const string& name, char scope) {
-    // TODO: GlobalST/LocalST 에서 이름 검색 구현
+int searchName(const string& name, char mode) {
+    switch(mode) {
+        case 'G': {
+            for (int i=0; i < (int)globalSymbols.size(); i++) {
+                // cout << "testing\t" << globalSymbols[i].name << endl;
+                if (globalSymbols[i].name == name) return i;
+            }
+            break;
+        }
+        case 'L': {
+            for (int i=0; i < (int)localSymbols.size(); i++) {
+                if (localSymbols[i].name == name) return i;
+            }
+            break;
+        }
+        case 'F': {
+            int n = searchName(name, 'G');
+            if (n != -1 && globalSymbols[n].kind == functionID) return n;
+            break;
+        }
+        case 'V': {
+            int n;
+            if (searchName(name, 'F') != -1) error_exit("함수명과 중복되었습니다.");
+
+            if (isProcessingFunction) {
+                return searchName(name, 'L');
+            }
+
+            n = searchName(name, 'G');
+            if (n == -1) {
+                return searchName(name, 'L');
+            } else {
+                return n;
+            }
+        }
+    }
     return -1;
 }
 
+// 메모리 안에 인수로 주어진 심볼 테이블을 저장합니다.
+// 자동으로 메모리를 재할당하며, 이름 중복 검사를 수행합니다.
+// 리턴값은 삽입한 심볼 테이블(메모리)의 현재 크기입니다.
 int enter(SymbolTable& table, SymbolKind kind) {
     int n, memorySize;
     bool isLocal = is_localname(table.name, kind);
@@ -88,6 +127,64 @@ int enter(SymbolTable& table, SymbolKind kind) {
     
 }
 
+void setCode() {}
+
+void declareVariable() {}
+void declareFunction() {}
+
+void convert_block() {
+    int location;
+    token = analyze();
+
+    switch(token.kind) {
+        case IDENTIFIER:
+            if ((location = searchName(token.text, 'F')) == -1) {
+                // 함수 호출에 대한 처리
+            }
+
+            if ((location = searchName(token.text, 'V')) == -1) {
+                // 변수 선언에 관한 처리 (explicit, implicit)
+            }
+            // 나머지 경우에 관한 처리
+    
+    }
+}
+
+void convert_blockSet() {
+    int endLine = 0;
+    int kind = token.kind;
+
+    token = analyze();
+
+    if (token.kind != BRAC_1) {
+        error_exit("블럭이 시작되지 않았습니다.");
+    }
+
+    while(token.kind != ELIF && token.kind != ELSE && token.kind != BRAC_2 && token.kind != EOF_TOKEN) {
+        convert_block();
+    }
+
+    if (token.kind == EOF_TOKEN) {
+        error_exit("블럭의 끝이 정의되지 않았습니다.");
+    }
+}
+void setCodeEnd() {}
+
+void convert() {
+    currentSymTbl.clear();
+    switch(token.kind) {
+        case VAR: declareVariable(); break;
+        case FUNC: declareFunction(); break;
+        // case WHILE: case FOR:
+        case IF:
+            convert_blockSet();
+            while (token.kind = ELIF) convert_blockSet();
+            while (token.kind == ELSE) convert_blockSet();
+            setCodeEnd();
+            break;
+    }
+}
+
 void parseIntercode() {
     resetPointer();
 	do {
@@ -99,6 +196,12 @@ void parseIntercode() {
             enter(currentSymTbl, functionID);
 		}
 	} while (token.kind != EOF_TOKEN);
+
+    resetPointer();
+    
+    while (token.kind != EOF_TOKEN) {
+        convert();
+    }
 
     for (int i=0; i < globalSymbols.size(); i++) {
         globalSymbols[i].printElements();
