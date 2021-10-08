@@ -13,6 +13,8 @@ SymbolTable currentSymTbl;
 bool isProcessingFunction = false;
 int localAddress = 0;
 
+
+
 void set_name() {
 	if (token.kind != IDENTIFIER) {
 		error_exit(FuncDeclareError, "'함수' 키워드 뒤에는 함수 이름이 필요합니다.\n함수 " + token.text + CYAN + "\n     ^^^^" + RESET);
