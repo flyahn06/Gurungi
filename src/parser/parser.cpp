@@ -15,6 +15,8 @@ SymbolTable currentSymTbl;
 bool isProcessingFunction = false;
 int localAddress = 0;
 
+
+// 함수의 이름을 등록하는 함수입니다. 키워드 "함수" 뒤에 함수 이름이 나오지 않으면 오류를 발생시킵니다.
 void set_name() {
 	if (token.kind != IDENTIFIER) {
 		error_exit(FuncDeclareError, "'함수' 키워드 뒤에는 함수 이름이 필요합니다.\n함수 " + token.text + CYAN + "\n     ^^^^" + RESET);
@@ -24,15 +26,21 @@ void set_name() {
     token = analyze();
 }
 
+
+// 파싱 중 글로벌 영역에서의 선언인지 로컬 영역에서의 선언인지를 판단하기 위한 함수입니다.
 bool is_processing_localscope() {
     return isProcessingFunction;
 }
 
+// 식별자의 이름이 로컬 영역에서 사용하는지 글로벌 영역에서 사용하는지를 판단하는 함수입니다.
 bool is_localname(const string& name, SymbolKind kind) {
+    // 파라미터면 무조건 로컬영역에서 사용됩니다.
     if (kind == parameterID) return true;
+
+    // 변수의 선언일 때
     if (kind == variableID) {
-        if (is_processing_localscope()) return true;
-        else                            return false;
+        if (is_processing_localscope()) return true;  // 블럭 처리중인 경우
+        else                            return false; // 아닌 경우
     }
     return false;
 }
