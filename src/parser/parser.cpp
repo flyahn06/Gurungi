@@ -17,6 +17,7 @@ bool isProcessingFunction = false;
 int localAddress = 0;
 
 void convert();
+void printAllTables();
 
 
 
@@ -145,7 +146,7 @@ void declareVariable() {
     currentSymTbl.address = localVariables.size();
 
     globalSymbols.push_back(currentSymTbl);
-    
+    cout << "변수 선언 성공: " << token.text << endl;
 }
 void declareFunction() {}
 
@@ -195,11 +196,16 @@ void convert() {
     cout << endl << ">>> convert 호출됨: " << token.text << " <<<" << endl; 
     currentSymTbl.clear();
 
+    if (token.kind == OTHERS) {
+        intercode.push_back("\n");
+        cout << "토큰 스킵" << endl;
+        return;
+    }
+
     switch(token.kind) {
         case VAR: declareVariable(); break;
         case FUNC:declareFunction(); break;
         case IDENTIFIER:
-            cout << "ident" << endl;
             if ((location = searchName(token.text, 'F')) != -1) {
                 // 함수 호출인 경우(좀 꼬임)
                 // = 만약 모든 테이블에서 변수인 이름이 없는 경우
@@ -210,7 +216,8 @@ void convert() {
             if ((location = searchName(token.text, 'V')) != -1) {
                 // 역
                 cout << "변수 찾음@" << location << endl;
-                
+                intercode.push_back("GVar");
+                intercode.push_back(to_string(location));
                 
             }
             break;
@@ -222,32 +229,50 @@ void convert() {
             while (token.kind == ELSE) convert_blockSet();
             setCodeEnd();
             break;
+            case PLUS: case MINUS: case STAR: case SLASH: case LESS: case LESSEQ: case GREAT: case GREATEQ:
+                case EQUAL: case NOTEQUAL: case ASSIGN: case COMMA: case DOT: case QUOTE:
+                    intercode.push_back("[" + to_string(token.kind) + "]");
+                break;
+        case NUMBER:
+            intercode.push_back("[" + to_string(NUMBER) + "]");
+            intercode.push_back(to_string(token.intValue));
+            break;
+        case STRING:
+            intercode.push_back("[" + to_string(STRING) + "]");
+            intercode.push_back(token.text);
+            break;
+        case PRINT:
+            intercode.push_back("[" + to_string(PRINT) + "]");
+            break;
+        default:
+            cout << RED << "! 마땅한 동작 하지 않음" << RESET << endl;
     }
+    printAllTables();
 }
 
 void printAllTables() {
     
     cout << "globalSymbols >>>" << endl;
-    for (int i=0; i < globalSymbols.size(); i++) {
-        cout << globalSymbols[i].name << "(" << globalSymbols[i].kind << ")" << endl;
+    for (auto & globalSymbol : globalSymbols) {
+        cout << globalSymbol.name << "(" << globalSymbol.kind << ")" << endl;
     }
     cout << "<<<" << endl;
 
     cout << "localSymbols >>>" << endl;
-    for (int i=0; i < localSymbols.size(); i++) {
-        cout << localSymbols[i].name << "(" << localSymbols[i].kind << ")" << endl;;
+    for (auto & localSymbol : localSymbols) {
+        cout << localSymbol.name << "(" << localSymbol.kind << ")" << endl;;
     }
     cout << "<<<" << endl;
 
     cout << "globalVariables >>>" << endl;
-    for (int i=0; i < globalVariables.size(); i++) {
-        cout << globalVariables[i] << " ";
+    for (int globalVariable : globalVariables) {
+        cout << globalVariable << " ";
     }
     cout << "<<<" << endl;
 
     cout << "localVariables >>>" << endl;
-    for (int i=0; i < localVariables.size(); i++) {
-        cout << localVariables[i] << " ";
+    for (int localVariable : localVariables) {
+        cout << localVariable << " ";
     }
     cout << "<<<" << endl;
 
@@ -274,11 +299,40 @@ void parseIntercode() {
     // 모든 블럭을 내부 코드로 파싱
     while (token.kind != EOF_TOKEN) {
         convert();
-        printAllTables();
         token = analyze();
     }
 
-    for (int i=0; i < globalSymbols.size(); i++) {
-        globalSymbols[i].printElements();
+    for (auto & globalSymbol : globalSymbols) {
+        globalSymbol.printElements();
+    }
+
+    bool isLiteral = false;
+    int tmp;
+    for (auto & code : intercode) {
+//        cout << "Process code " << code;
+        cout << " ";
+//        cout << code << endl;
+//    }
+        if(isLiteral) {
+            isLiteral = false;
+            cout << code;
+        } else if(code[0] == '[' && code[code.length()-1] == ']') {
+            try {
+
+                tmp = stoi(code.substr(1, code.length() - 2)) -1;
+            } catch (const exception &e) {
+                cout << code;
+                continue;
+            }
+            if (tmp == NUMBER || tmp == STRING) {
+                isLiteral = true;
+            }
+//            cout << tmp;
+            cout << "[" << TokenKindMap[tmp] << "]";
+        } else if (code == "GVar"){
+            cout << "[GVar]";
+        } else {
+            cout << code;
+        }
     }
 }
