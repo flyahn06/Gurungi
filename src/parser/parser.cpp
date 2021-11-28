@@ -16,6 +16,8 @@ SymbolTable currentSymTbl;
 bool isProcessingFunction = false;
 int localAddress = 0;
 
+void convert();
+
 
 
 // 함수의 이름을 등록하는 함수입니다. 키워드 "함수" 뒤에 함수 이름이 나오지 않으면 오류를 발생시킵니다.
@@ -129,35 +131,44 @@ int enter(SymbolTable& table, SymbolKind kind) {
 
 void setCode() {}
 
-void declareVariable() {}
+void declareVariable() {
+    token = analyze();
+    if (token.kind != IDENTIFIER) {
+        error_exit("\"변수\" 키위드 뒤에는 반드시 변수 이름이 와야 합니다.");
+    }
+
+    localVariables.push_back(token.intValue);
+
+
+    currentSymTbl.kind = variableID;
+    currentSymTbl.name = token.text;
+    currentSymTbl.address = localVariables.size();
+
+    globalSymbols.push_back(currentSymTbl);
+    
+}
 void declareFunction() {}
 
+
+// 실제로 라인을 처리하는 함수입니다.
 void convert_block() {
     int location;
-    token = analyze();
-
-    switch(token.kind) {
-        case IDENTIFIER:
-            if ((location = searchName(token.text, 'F')) == -1) {
-                // 함수 호출에 대한 처리
-            }
-
-            if ((location = searchName(token.text, 'V')) == -1) {
-                // 변수 선언에 관한 처리 (explicit, implicit)
-            }
-            // 나머지 경우에 관한 처리
-    
-    }
+    token = analyze(); // 다음 토큰을 불러옴
+    convert();
 }
 
+// convert() 에서 불려집니다.
 void convert_blockSet() {
+    // 블럭이 끝나는 라인의 번호
     int endLine = 0;
+    // 현재 토큰의 종류 (FUNC, FOR, IF, WHILE 등등)
     int kind = token.kind;
 
+    // 다음 토큰을 불러옴
     token = analyze();
 
     if (token.kind != BRAC_1) {
-        error_exit("블럭이 시작되지 않았습니다.");
+        error_exit("블럭이 시작되지 않았습니다." + token.text);
     }
 
     while(token.kind != ELIF && token.kind != ELSE && token.kind != BRAC_2 && token.kind != EOF_TOKEN) {
@@ -168,13 +179,42 @@ void convert_blockSet() {
         error_exit("블럭의 끝이 정의되지 않았습니다.");
     }
 }
+
 void setCodeEnd() {}
 
+void callFunction(int location) {
+    cout << "함수 실행!" << location << endl;
+}
+
+// 주어진 토큰을 내부 코드로 변환합니다.
+// 블럭을 만나면 convert_blockSet()을 실행합니다.
+// convert_blockSet() <-> convert() 재귀적 실행
 void convert() {
+    int location;
+
+    cout << endl << ">>> convert 호출됨: " << token.text << " <<<" << endl; 
     currentSymTbl.clear();
+
     switch(token.kind) {
         case VAR: declareVariable(); break;
-        case FUNC: declareFunction(); break;
+        case FUNC:declareFunction(); break;
+        case IDENTIFIER:
+            cout << "ident" << endl;
+            if ((location = searchName(token.text, 'F')) != -1) {
+                // 함수 호출인 경우(좀 꼬임)
+                // = 만약 모든 테이블에서 변수인 이름이 없는 경우
+                cout << "Callfunction" << endl;
+                callFunction(location);
+            }
+
+            if ((location = searchName(token.text, 'V')) != -1) {
+                // 역
+                cout << "변수 찾음@" << location << endl;
+                
+                
+            }
+            break;
+            // 나머지 경우에 관한 처리
         // case WHILE: case FOR:
         case IF:
             convert_blockSet();
@@ -185,8 +225,38 @@ void convert() {
     }
 }
 
+void printAllTables() {
+    
+    cout << "globalSymbols >>>" << endl;
+    for (int i=0; i < globalSymbols.size(); i++) {
+        cout << globalSymbols[i].name << "(" << globalSymbols[i].kind << ")" << endl;
+    }
+    cout << "<<<" << endl;
+
+    cout << "localSymbols >>>" << endl;
+    for (int i=0; i < localSymbols.size(); i++) {
+        cout << localSymbols[i].name << "(" << localSymbols[i].kind << ")" << endl;;
+    }
+    cout << "<<<" << endl;
+
+    cout << "globalVariables >>>" << endl;
+    for (int i=0; i < globalVariables.size(); i++) {
+        cout << globalVariables[i] << " ";
+    }
+    cout << "<<<" << endl;
+
+    cout << "localVariables >>>" << endl;
+    for (int i=0; i < localVariables.size(); i++) {
+        cout << localVariables[i] << " ";
+    }
+    cout << "<<<" << endl;
+
+    
+}
+
 void parseIntercode() {
     resetPointer();
+    // 소스코드에서 함수 이름만 읽어들여서 임시로 메모리에 삽입
 	do {
 		token = analyze();
 		// cout << (token.kind == FUNC) << endl;
@@ -197,10 +267,15 @@ void parseIntercode() {
 		}
 	} while (token.kind != EOF_TOKEN);
 
+    // lexer 초기화
     resetPointer();
-    
+    token = analyze();
+
+    // 모든 블럭을 내부 코드로 파싱
     while (token.kind != EOF_TOKEN) {
         convert();
+        printAllTables();
+        token = analyze();
     }
 
     for (int i=0; i < globalSymbols.size(); i++) {
