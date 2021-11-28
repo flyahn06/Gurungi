@@ -3,20 +3,23 @@
 using namespace std;
 
 KeyWord keyWordTable[] = {
-	{"만약", IF}, {"아니라면", ELSE},
-	{"끝", END}, {"출력", PRINT},
-	{"함수", FUNC}, {"변수", VAR},
-	{"(", RBRK_1}, {")", RBRK_2},
-	{"{", BRAC_1}, {"}", BRAC_2},
-	{"[", SBRK_1}, {"]", SBRK_2},
-	{"+", PLUS}, {"-", MINUS},
-	{"*", STAR}, {"/", SLASH},
-	{"=", ASSIGN}, {",", COMMA},
-	{"==", EQUAL}, {"/=", NOTEQUAL},
-	{"<", LESS}, {">", GREAT},
-	{"<=", LESSEQ}, {">=", GREATEQ},
-	{"\"", QUOTE}, {"\n", OTHERS}
+        {"만약", IF}, {"아니라면", ELSE},
+        {"끝", END}, {"출력", PRINT},
+        {"함수", FUNC}, {"변수", VAR},
+        {"(", RBRK_1}, {")", RBRK_2},
+        {"{", BRAC_1}, {"}", BRAC_2},
+        {"[", SBRK_1}, {"]", SBRK_2},
+        {"+", PLUS}, {"-", MINUS},
+        {"*", STAR}, {"/", SLASH},
+        {"=", ASSIGN}, {",", COMMA},
+        {"==", EQUAL}, {"/=", NOTEQUAL},
+        {"<", LESS}, {">", GREAT},
+        {"<=", LESSEQ}, {">=", GREATEQ},
+        {"\"", QUOTE}, {"\n", OTHERS}
 };
+
+vector<string> TokenKindMap;
+
 
 void SymbolTable::clear() {
 	name = "";
@@ -28,7 +31,7 @@ void SymbolTable::clear() {
 	frame = 0;
 }
 
-void SymbolTable::printElements() {
+void SymbolTable::printElements() const {
 	cout
 	<< "name: " << name << endl
 	<< "kind: " << kind << endl
@@ -40,3 +43,24 @@ void SymbolTable::printElements() {
 }
 
 Token token;
+
+void initialize() {
+    TokenKindMap = {
+            "RBRK_1", "RBRK_2", "BRAC_1", "BRAC_2", "SBRK_1", "SBRK_2",
+
+            "PLUS", "MINUS", "STAR", "SLASH",
+            "LESS", "LESSEQ", "GREAT", "GREATEQ", "EQUAL", "NOTEQUAL",
+
+            "ASSIGN", "COMMA", "DOT", "QUOTE",
+
+            "PRINT",
+            "IF", "ELSE", "ELIF", "WHILE", "FOR",
+            "FUNC", "VAR",
+            "END",
+
+            "DIGIT", "LETTER", "INTVALUE", "DOUBLEVALUE",
+
+            "IDENTIFIER", "NUMBER", "STRING", "OTHERS",
+            "EOF_TOKEN"
+    };
+}

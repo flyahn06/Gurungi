@@ -1,7 +1,9 @@
 #include <string>
 #include <iostream>
+#include <vector>
 
 #define KEYCOUNT 26
+#define TOKENKINDCOUNT 38
 #ifndef _GTYPES_HPP_
 #define _GTYPES_HPP_
 
@@ -71,9 +73,11 @@ struct SymbolTable {
 	}
 	
 	void clear();
-	void printElements();
+	void printElements() const;
 };
 
 #endif
 extern KeyWord keyWordTable[KEYCOUNT];
 extern Token token;
+extern std::vector<std::string> TokenKindMap;
+void initialize();
