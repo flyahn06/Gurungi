@@ -43,6 +43,4 @@ test.txt
 .vscode/
 *.log
 .idea/
-
-# 테스트용 구렁이 코드
 Helloworld.gu
