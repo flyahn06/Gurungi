@@ -9,6 +9,7 @@
 using namespace std;
 
 int main(int argc, char* args[]) {
+
 	if (argc == 1) {
 		error_exit("파일 이름이 없습니다. 자세한 내용은 \"Gurungi --도움\"을 참조하세요!");
 	}
@@ -29,6 +30,8 @@ int main(int argc, char* args[]) {
 	initLexAnalysis(source);
 	lexAnalysisDebug();
 	cout << "어휘 분석을 마쳤습니다." << endl;
+
+    initialize();
 	
 	resetPointer();
 	cout << "파싱중입니다..." << endl;
