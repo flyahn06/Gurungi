@@ -130,6 +130,10 @@ int enter(SymbolTable& table, SymbolKind kind) {
     
 }
 
+void expect(TokenKind k, TokenKind r) {
+    if (k != l) error_exit("오류: 토큰의 기댓값이 일치하지 않습니다.")
+}
+
 void setCode() {}
 
 void declareVariable() {
@@ -148,7 +152,30 @@ void declareVariable() {
     globalSymbols.push_back(currentSymTbl);
     cout << "변수 선언 성공: " << token.text << endl;
 }
-void declareFunction() {}
+
+// 함수 정의 처리
+void declareFunction() {
+    string function_name;
+
+    token = analyze(); // 함수 키워드 스킵, 공백 스킵, 함수 이름 가져오기 위함
+    expect(IDENTIFIER, token.kind);
+
+    function_name = token.text;
+
+    token = analyze(); // 괄호 시작
+    expect(RBRK_1, token.kind);
+    do {
+        convert();
+    } while (token.kind == RBRK_2 || token.kind == OTHERS || token.kind == EOF_TOKEN); // 파라미터 끝
+
+    expect(RBRK_2, token.kind);
+    // 파라미터 처리 끝
+
+    token = analyze();
+    expect(BRAC_1, token.kind);
+    // TODO: 함수 몸체 처리 구현
+    expect(BRAC_2, token.kind);
+}
 
 
 // 실제로 라인을 처리하는 함수입니다.
@@ -284,7 +311,6 @@ void parseIntercode() {
     // 소스코드에서 함수 이름만 읽어들여서 임시로 메모리에 삽입
 	do {
 		token = analyze();
-		// cout << (token.kind == FUNC) << endl;
 		if (token.kind == FUNC) {
 			token = analyze();
 			set_name();
@@ -309,10 +335,8 @@ void parseIntercode() {
     bool isLiteral = false;
     int tmp;
     for (auto & code : intercode) {
-//        cout << "Process code " << code;
         cout << " ";
-//        cout << code << endl;
-//    }
+
         if(isLiteral) {
             isLiteral = false;
             cout << code;
@@ -327,7 +351,6 @@ void parseIntercode() {
             if (tmp == NUMBER || tmp == STRING) {
                 isLiteral = true;
             }
-//            cout << tmp;
             cout << "[" << TokenKindMap[tmp] << "]";
         } else if (code == "GVar"){
             cout << "[GVar]";
