@@ -51,7 +51,7 @@ string getNextChar() {
     // 먼저 한 글자만을 읽어옵니다.
     string temp = source.substr(pointer-1, 1);
 
-    if (regex_match(temp, regAscii) || checkIsSpace(temp) || temp == "\n") {
+    if (regex_match(temp, regAscii) || checkIsSpace(temp) || temp == "\n" || temp == "\\") {
         // 만약 아스키코드나 공백 중 하나라면 (한글이 아니라면) 바로 리턴합니다.
         return temp;
     }
