@@ -1,4 +1,6 @@
 # Gurungi, 구렁이
+<img src="/img/logo.png">
+
 ```
 출력 "안녕, 세계!"
 ``` 
