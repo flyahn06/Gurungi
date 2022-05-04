@@ -8,9 +8,15 @@ long unsigned int pointer = 0;
 int line = 1;
 
 // -- 어휘 분석을 위한 정규식 --
-regex regAscii("[a-zA-Z0-9!?@#$%^&*():;+-=~{}<>\\_\\[\\]\\|\\\"\'\\,\\.\\/\\`\\₩]");
+//regex regAscii("[a-zA-Z0-9!?@#$%^&*():;+-=~{}<>\\_\\[\\]\\|\\\"\\\'\\,\\.\\/\\`\\₩]");
+//regex regDigit("[0-9]");
+//regex regOper("[\\+|\\-|\\*|\\/|<|>|=|>=|<=|==]");
+//regex regBrac("[\\[\\]\\(\\)\\{\\}]");
+//regex regLetter("[a-zA-Z가-힣]");
+
+regex regAscii("[a-zA-Z0-9!?@#$%^&*():;+-=~{}<>_\\[\\]\\|\\\"\\\'\\,\\.\\/\\`\\₩]");
 regex regDigit("[0-9]");
-regex regOper("(\\+|\\-|\\*|\\/|<|>|=|>=|<=|==)");
+regex regOper("[\\+|\\-|\\*|\\/|<|>|=|>=|<=|==]");
 regex regBrac("[\\[\\]\\(\\)\\{\\}]");
 regex regLetter("[a-zA-Z가-힣]");
 
