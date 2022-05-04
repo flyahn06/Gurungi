@@ -45,7 +45,7 @@ void SymbolTable::printElements() const {
 Token token;
 
 void initialize() {
-    TokenKindMap = {
+    string Tokens[] = {
             "RBRK_1", "RBRK_2", "BRAC_1", "BRAC_2", "SBRK_1", "SBRK_2",
 
             "PLUS", "MINUS", "STAR", "SLASH",
@@ -63,4 +63,8 @@ void initialize() {
             "IDENTIFIER", "NUMBER", "STRING", "OTHERS",
             "EOF_TOKEN"
     };
+
+    for (int i=0; i < Tokens->size() / sizeof(string); i++) {
+        TokenKindMap.push_back(Tokens[i]);
+    }
 }

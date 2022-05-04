@@ -11,6 +11,8 @@ GMemory DMemory;
 vector<string> intercode;
 SymbolTable currentSymTbl;
 
+void convert_blockSet();
+
 // 주석작성 refactoring
 
 bool isProcessingFunction = false;
@@ -131,7 +133,8 @@ int enter(SymbolTable& table, SymbolKind kind) {
 }
 
 void expect(TokenKind k, TokenKind r) {
-    if (k != l) error_exit("오류: 토큰의 기댓값이 일치하지 않습니다.")
+    cout << "k: " << k << "\t\tr: " << r << endl;
+    if (k != r) error_exit("오류: 토큰의 기댓값이 일치하지 않습니다.");
 }
 
 void setCode() {}
@@ -157,7 +160,7 @@ void declareVariable() {
 void declareFunction() {
     string function_name;
 
-    token = analyze(); // 함수 키워드 스킵, 공백 스킵, 함수 이름 가져오기 위함
+    token = analyze(); // 함수 키워드 스킵, 공백 스킵, 함수 이름 가져오기
     expect(IDENTIFIER, token.kind);
 
     function_name = token.text;
@@ -165,15 +168,18 @@ void declareFunction() {
     token = analyze(); // 괄호 시작
     expect(RBRK_1, token.kind);
     do {
+        token = analyze();
+        cout << token.text << endl;
         convert();
-    } while (token.kind == RBRK_2 || token.kind == OTHERS || token.kind == EOF_TOKEN); // 파라미터 끝
-
+    } while (token.kind != RBRK_2 || token.kind != OTHERS || token.kind != EOF_TOKEN); // 파라미터 끝
     expect(RBRK_2, token.kind);
     // 파라미터 처리 끝
+    cout << "파라미터 처리 끝";
 
     token = analyze();
     expect(BRAC_1, token.kind);
-    // TODO: 함수 몸체 처리 구현
+    // TODO: 함수 몸체 처리 구현 -- 실행하면 unexpected token 오류가 발생하니다.
+    return;
     expect(BRAC_2, token.kind);
 }
 
@@ -206,6 +212,8 @@ void convert_blockSet() {
     if (token.kind == EOF_TOKEN) {
         error_exit("블럭의 끝이 정의되지 않았습니다.");
     }
+
+    cout << "CVBLKSET_END" << endl;
 }
 
 void setCodeEnd() {}
@@ -257,7 +265,7 @@ void convert() {
             setCodeEnd();
             break;
             case PLUS: case MINUS: case STAR: case SLASH: case LESS: case LESSEQ: case GREAT: case GREATEQ:
-                case EQUAL: case NOTEQUAL: case ASSIGN: case COMMA: case DOT: case QUOTE:
+            case EQUAL: case NOTEQUAL: case ASSIGN: case COMMA: case DOT: case QUOTE: case RBRK_1: case RBRK_2:
                     intercode.push_back("[" + to_string(token.kind) + "]");
                 break;
         case NUMBER:
@@ -274,7 +282,7 @@ void convert() {
         default:
             cout << RED << "! 마땅한 동작 하지 않음" << RESET << endl;
     }
-    printAllTables();
+    //printAllTables();
 }
 
 void printAllTables() {
