@@ -45,3 +45,5 @@ test.txt
 .idea/
 Helloworld.gu
 .DS_store
+.cmake-build-debug/
+.build/
