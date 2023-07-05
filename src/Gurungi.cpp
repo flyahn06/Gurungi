@@ -1,7 +1,5 @@
 #include <iostream>
 #include <string>
-#include <vector>
-
 #include "lexer/lexer.hpp"
 #include "utils/errors.hpp"
 #include "parser/parser.hpp"
@@ -24,9 +22,6 @@ int main(int argc, char* args[]) {
     string source;
     while (!fin.eof()) source += fin.get();
 	source.resize(source.length() - 1); // 맨 마지막 EOF 거르기용
-//    source.reserve(source.size() + count(source.begin(), source.end(), '\\') * 2);
-//    source.replace(source.begin(), source.end(), '\\', '`')
-
 
     cout << filename << " 파일을 인터프릿합니다." << endl
 		<< "어휘 분석을 실행하는 중입니다..." << endl;
@@ -35,12 +30,9 @@ int main(int argc, char* args[]) {
 	lexAnalysisDebug();
 	cout << "어휘 분석을 마쳤습니다." << endl;
 
-    initialize();
-	
 	resetPointer();
 	cout << "파싱중입니다..." << endl;
 	parseIntercode();
-	
-	
+
 	return 0;
 }

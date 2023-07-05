@@ -129,7 +129,7 @@ int enter(SymbolTable& table, SymbolKind kind) {
     }
 
     return n;
-    
+
 }
 
 void expect(TokenKind k, TokenKind r) {
@@ -171,7 +171,7 @@ void declareFunction() {
         token = analyze();
         cout << token.text << endl;
         convert();
-    } while (token.kind != RBRK_2 || token.kind != OTHERS || token.kind != EOF_TOKEN); // 파라미터 끝
+    } while (token.kind != RBRK_2 && token.kind != OTHERS && token.kind != EOF_TOKEN); // 파라미터 끝
     expect(RBRK_2, token.kind);
     // 파라미터 처리 끝
     cout << "파라미터 처리 끝";
@@ -228,7 +228,7 @@ void callFunction(int location) {
 void convert() {
     int location;
 
-    cout << endl << ">>> convert 호출됨: " << token.text << " <<<" << endl; 
+    cout << endl << ">>> convert 호출됨: " << token.text << " <<<" << endl;
     currentSymTbl.clear();
 
     if (token.kind == OTHERS) {
@@ -248,12 +248,12 @@ void convert() {
                 callFunction(location);
             }
 
-            if ((location = searchName(token.text, 'V')) != -1) {
+            else if ((location = searchName(token.text, 'V')) != -1) {
                 // 역
                 cout << "변수 찾음@" << location << endl;
                 intercode.push_back("GVar");
                 intercode.push_back(to_string(location));
-                
+
             }
             break;
             // 나머지 경우에 관한 처리
@@ -279,14 +279,18 @@ void convert() {
         case PRINT:
             intercode.push_back("[" + to_string(PRINT) + "]");
             break;
+
+        case EOF_TOKEN:
+            cout << "파싱 작업이 끝났습니다." << endl;
+            break;
+
         default:
             cout << RED << "! 마땅한 동작 하지 않음" << RESET << endl;
     }
-    //printAllTables();
 }
 
 void printAllTables() {
-    
+
     cout << "globalSymbols >>>" << endl;
     for (auto & globalSymbol : globalSymbols) {
         cout << globalSymbol.name << "(" << globalSymbol.kind << ")" << endl;
@@ -295,7 +299,7 @@ void printAllTables() {
 
     cout << "localSymbols >>>" << endl;
     for (auto & localSymbol : localSymbols) {
-        cout << localSymbol.name << "(" << localSymbol.kind << ")" << endl;;
+        cout << localSymbol.name << "(" << localSymbol.kind << ")" << endl;
     }
     cout << "<<<" << endl;
 
@@ -311,7 +315,7 @@ void printAllTables() {
     }
     cout << "<<<" << endl;
 
-    
+
 }
 
 void parseIntercode() {
@@ -326,6 +330,7 @@ void parseIntercode() {
 		}
 	} while (token.kind != EOF_TOKEN);
 
+
     // lexer 초기화
     resetPointer();
     token = analyze();
@@ -335,10 +340,11 @@ void parseIntercode() {
         convert();
         token = analyze();
     }
-
-    for (auto & globalSymbol : globalSymbols) {
-        globalSymbol.printElements();
-    }
+//    cout << RED << "!important: " << token.kind << endl;
+//
+//    for (auto & globalSymbol : globalSymbols) {
+//        globalSymbol.printElements();
+//    }
 
     bool isLiteral = false;
     int tmp;

@@ -18,7 +18,19 @@ KeyWord keyWordTable[] = {
         {"\"", QUOTE}, {"\n", OTHERS}
 };
 
-vector<string> TokenKindMap;
+vector<string> TokenKindMap = {
+        "RBRK_1", "RBRK_2", "BRAC_1", "BRAC_2", "SBRK_1", "SBRK_2",
+        "PLUS", "MINUS", "STAR", "SLASH",
+        "LESS", "LESSEQ", "GREAT", "GREATEQ", "EQUAL", "NOTEQUAL",
+        "ASSIGN", "COMMA", "DOT", "QUOTE",
+        "PRINT",
+        "IF", "ELSE", "ELIF", "WHILE", "FOR",
+        "FUNC", "VAR",
+        "END",
+        "DIGIT", "LETTER", "INTVALUE", "DOUBLEVALUE",
+        "IDENTIFIER", "NUMBER", "STRING", "OTHERS",
+        "EOF_TOKEN"
+};
 
 
 void SymbolTable::clear() {
@@ -44,27 +56,27 @@ void SymbolTable::printElements() const {
 
 Token token;
 
-void initialize() {
-    string Tokens[] = {
-            "RBRK_1", "RBRK_2", "BRAC_1", "BRAC_2", "SBRK_1", "SBRK_2",
-
-            "PLUS", "MINUS", "STAR", "SLASH",
-            "LESS", "LESSEQ", "GREAT", "GREATEQ", "EQUAL", "NOTEQUAL",
-
-            "ASSIGN", "COMMA", "DOT", "QUOTE",
-
-            "PRINT",
-            "IF", "ELSE", "ELIF", "WHILE", "FOR",
-            "FUNC", "VAR",
-            "END",
-
-            "DIGIT", "LETTER", "INTVALUE", "DOUBLEVALUE",
-
-            "IDENTIFIER", "NUMBER", "STRING", "OTHERS",
-            "EOF_TOKEN"
-    };
-
-    for (int i=0; i < Tokens->size() / sizeof(string); i++) {
-        TokenKindMap.push_back(Tokens[i]);
-    }
-}
+//void initialize() {
+//    string Tokens[] = {
+//            "RBRK_1", "RBRK_2", "BRAC_1", "BRAC_2", "SBRK_1", "SBRK_2",
+//
+//            "PLUS", "MINUS", "STAR", "SLASH",
+//            "LESS", "LESSEQ", "GREAT", "GREATEQ", "EQUAL", "NOTEQUAL",
+//
+//            "ASSIGN", "COMMA", "DOT", "QUOTE",
+//
+//            "PRINT",
+//            "IF", "ELSE", "ELIF", "WHILE", "FOR",
+//            "FUNC", "VAR",
+//            "END",
+//
+//            "DIGIT", "LETTER", "INTVALUE", "DOUBLEVALUE",
+//
+//            "IDENTIFIER", "NUMBER", "STRING", "OTHERS",
+//            "EOF_TOKEN"
+//    };
+//
+//    for (int i=0; i < Tokens->size() / sizeof(string); i++) {
+//        TokenKindMap.push_back(Tokens[i]);
+//    }
+//}
