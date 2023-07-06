@@ -33,7 +33,7 @@ void GMemory::add(int address, double data) {
 }
 
 double GMemory::get(int address) {
-
+    return 0.01;  // TODO: 임시 리턴값
 }
 
 int GMemory::size() {

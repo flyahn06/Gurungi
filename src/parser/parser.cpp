@@ -269,7 +269,7 @@ void convert() {
         // case WHILE: case FOR:
         case IF:
             convert_blockSet();
-            while (token.kind = ELIF) convert_blockSet();
+            while (token.kind == ELIF) convert_blockSet();
             while (token.kind == ELSE) convert_blockSet();
             setCodeEnd();
             break;
@@ -354,8 +354,16 @@ void parseIntercode() {
 
     bool isLiteral = false;
     int tmp;
+    int line=1;
+
     for (auto & code : intercode) {
         cout << " ";
+
+        if (code == "\n") {
+            cout << "\nln " << line << ":";
+            line++;
+            continue;
+        }
 
         if(isLiteral) {
             isLiteral = false;
