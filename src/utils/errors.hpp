@@ -39,6 +39,9 @@ class Error{
 extern Error* LexerError;
 extern Error* FuncDeclareError;
 extern Error* VarDeclareError;
+extern Error* BlockNotEndedError;
+extern Error* UnexpectedTokenError;
+extern Error* SyntaxError;
 void error_exit(const std::string& msg);
 void error_exit(const std::string& tempErrorName, const std::string& msg);
 void error_exit(Error *error, const std::string& msg);

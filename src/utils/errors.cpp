@@ -5,7 +5,9 @@ using namespace std;
 Error* LexerError = new Error("어휘 분석 오류");
 Error* FuncDeclareError = new Error("함수 정의 오류");
 Error* VarDeclareError = new Error("변수 정의 오류");
-
+Error* BlockNotEndedError = new Error("블럭 정의 오류");
+Error* UnexpectedTokenError = new Error("파싱 오류");
+Error* SyntaxError = new Error("문법 오류");
 
 string Error::getErrorName() {
 	return errorName;
