@@ -20,8 +20,8 @@ int localAddress = 0;
 
 void convert();
 void printAllTables();
-
-
+void expect(TokenKind, TokenKind);
+void expect(TokenKind, TokenKind, const string&);
 
 // 함수의 이름을 등록하는 함수입니다. 키워드 "함수" 뒤에 함수 이름이 나오지 않으면 오류를 발생시킵니다.
 void set_name() {
@@ -132,9 +132,15 @@ int enter(SymbolTable& table, SymbolKind kind) {
 
 }
 
+// 현재 토큰을 assert합니다.
+void expect(TokenKind k, TokenKind r, const string& errormsg) {
+    cout << "k: " << k << "\t\tr: " << r << endl;
+    if (k != r) error_exit(errormsg);
+}
+
 void expect(TokenKind k, TokenKind r) {
     cout << "k: " << k << "\t\tr: " << r << endl;
-    if (k != r) error_exit("오류: 토큰의 기댓값이 일치하지 않습니다.");
+    if (k != r) error_exit(LexerError,"오류: 토큰의 기댓값이 일치하지 않습니다.");
 }
 
 void setCode() {}
@@ -142,7 +148,7 @@ void setCode() {}
 void declareVariable() {
     token = analyze();
     if (token.kind != IDENTIFIER) {
-        error_exit("\"변수\" 키위드 뒤에는 반드시 변수 이름이 와야 합니다.");
+        error_exit(SyntaxError,"\"변수\" 키위드 뒤에는 반드시 변수 이름이 와야 합니다.");
     }
 
     localVariables.push_back(token.intValue);
@@ -207,18 +213,16 @@ void convert_blockSet() {
 
     // 다음 토큰을 불러옴
     token = analyze();
+    while (token.kind != BRAC_1 && token.kind != EOF_TOKEN) convert_block();
 
-    if (token.kind != BRAC_1) {
-        error_exit("블럭이 시작되지 않았습니다." + token.text);
-    }
+    expect(BRAC_1, token.kind, "블럭이 시작되지 않았습니다. " + token.text);
 
     while(token.kind != ELIF && token.kind != ELSE && token.kind != BRAC_2 && token.kind != EOF_TOKEN) {
         convert_block();
     }
 
-    if (token.kind == EOF_TOKEN) {
-        error_exit("블럭의 끝이 정의되지 않았습니다.");
-    }
+    expect(BRAC_2, token.kind, "블럭이 끝나지 않았습니다. " + token.text);
+
 
     cout << "CVBLKSET_END" << endl;
 }
@@ -288,7 +292,6 @@ void convert() {
         case PRINT:
             intercode.push_back("[" + to_string(PRINT) + "]");
             break;
-
         case EOF_TOKEN:
             cout << "파싱 작업이 끝났습니다." << endl;
             break;
