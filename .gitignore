@@ -47,3 +47,4 @@ Helloworld.gu
 .DS_store
 cmake-build-debug/
 build/
+cmake-build-gurungi/
