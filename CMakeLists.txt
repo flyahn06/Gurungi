@@ -22,7 +22,11 @@ add_executable(Gurungi
         src/utils/errors.hpp
         src/utils/gwrappers.cpp
         src/utils/gwrappers.hpp
-        )
+        src/parser/parser.cpp
+        src/lexer/lexer.cpp
+        src/executor/executor.cpp
+        src/executor/executor.hpp
+)
 
 # Set include directories
 target_include_directories(Gurungi PRIVATE
@@ -31,4 +35,6 @@ target_include_directories(Gurungi PRIVATE
         src/parser
         src/static_code_analysis
         src/types
-        src/utils)
+        src/utils
+        src/executor
+)
