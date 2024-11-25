@@ -1,14 +1,15 @@
+#ifndef _GTYPES_HPP_
+#define _GTYPES_HPP_
+
 #include <string>
 #include <iostream>
 #include <vector>
 
 #define KEYCOUNT 26
-#define TOKENKINDCOUNT 38
-#ifndef _GTYPES_HPP_
-#define _GTYPES_HPP_
+#define TOKENKINDCOUNT 39
 
 enum TokenKind {
-	RBRK_1=1, RBRK_2, BRAC_1, BRAC_2, SBRK_1, SBRK_2,
+	RBRK_1=0, RBRK_2, BRAC_1, BRAC_2, SBRK_1, SBRK_2,
 	
 	PLUS, MINUS, STAR, SLASH,   // 연산자 종류
 	LESS, LESSEQ, GREAT, GREATEQ, EQUAL, NOTEQUAL,
@@ -22,7 +23,7 @@ enum TokenKind {
 	
 	DIGIT, LETTER, INTVALUE, DOUBLEVALUE, // 어휘 분석 시 숫자와 문자로 나누어 분석하기 때문에 필요합니다.
 	
-	IDENTIFIER, NUMBER, STRING, OTHERS,  // 어휘 분석 후 토큰에 부여되는 타입
+	IDENTIFIER, NUMBER, STRING, OTHERS, NEW_LINE,  // 어휘 분석 후 토큰에 부여되는 타입
 	EOF_TOKEN
 
 };
@@ -37,6 +38,7 @@ struct Token {
 		kind = OTHERS;
 		text = "";
 		intValue = 0;
+		doubleValue = 0;
 	}
 	Token(TokenKind k, const std::string& s, int d) {
 		kind = k;
@@ -76,8 +78,9 @@ struct SymbolTable {
 	void printElements() const;
 };
 
-#endif
 extern KeyWord keyWordTable[KEYCOUNT];
 extern Token token;
 extern std::vector<std::string> TokenKindMap;
 void initialize();
+
+#endif

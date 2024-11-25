@@ -9,13 +9,11 @@ GMemory DMemory;
 std::vector<std::string> intercode;
 SymbolTable currentSymTbl;
 
-void convert_blockSet();
-
-// 주석작성 refactoring
-
 bool isProcessingFunction = false;
 int localAddress = 0;
+int currently_processing_function_addr = 0;
 
+void convert_blockSet();
 void convert();
 void printAllTables();
 void expect(TokenKind, TokenKind);
@@ -24,7 +22,8 @@ void expect(TokenKind, TokenKind, const std::string&);
 // 함수의 이름을 등록하는 함수입니다. 키워드 "함수" 뒤에 함수 이름이 나오지 않으면 오류를 발생시킵니다.
 void set_name() {
 	if (token.kind != IDENTIFIER) {
-		error_exit(FuncDeclareError, "'함수' 키워드 뒤에는 함수 이름이 필요합니다.\n함수 " + token.text + CYAN + "\n     ^^^^" + RESET);
+		error_exit(FuncDeclareError, getCurrentLineNumber(), "'함수' 키워드 뒤에는 함수 이름이 필요합니다.\n함수 " +
+		    token.text + CYAN + "\n    " + std::string(token.text.length(), '^') + RESET);
 	}
     currentSymTbl.clear();
     currentSymTbl.name = token.text;
@@ -53,9 +52,10 @@ bool is_localname(const std::string& name, SymbolKind kind) {
 // G/L symbols 안에서 주어진 이름을 검색합니다.
 // 찾으면: -1 이외의 모든 값 (예외발생)
 // 찾지 못하면: -1 (정상)
-int searchName(const string& name, char mode) {
+int searchName(const std::string& name, char mode) {
     switch(mode) {
         case 'G': {
+            // Global Symbol Table에서 검색 (Private)
             for (int i=0; i < (int)globalSymbols.size(); i++) {
                 // cout << "testing\t" << globalSymbols[i].name << endl;
                 if (globalSymbols[i].name == name) return i;
@@ -63,20 +63,27 @@ int searchName(const string& name, char mode) {
             break;
         }
         case 'L': {
+            // Local Symbol Table에서 검색 (Private)
             for (int i=0; i < (int)localSymbols.size(); i++) {
                 if (localSymbols[i].name == name) return i;
             }
             break;
         }
         case 'F': {
+            // 함수 이름 검색 (Public)
+            // 함수 이름은 GST에 들어가므로 GST만을 검색함.
             int n = searchName(name, 'G');
             if (n != -1 && globalSymbols[n].kind == functionID) return n;
             break;
         }
         case 'V': {
+            // 변수 이름 검색 (Public)
             int n;
+
+            // 함수명과 중복 검사
             if (searchName(name, 'F') != -1) error_exit("함수명과 중복되었습니다.");
 
+            // 현재 함수 처리중일 때 -> LST에서 찾음
             if (isProcessingFunction) {
                 return searchName(name, 'L');
             }
@@ -136,7 +143,14 @@ void expect(TokenKind k, TokenKind r, const std::string& errormsg) {
 }
 
 void expect(TokenKind k, TokenKind r) {
-    if (k != r) error_exit(LexerError,"오류: 토큰의 기댓값이 일치하지 않습니다.");
+    if (k != r) {
+        error_exit(SyntaxError, getCurrentLineNumber(), "토큰의 기댓값이 일치하지 않습니다. (Expected " + TokenKindMap[k] +
+            " but got " + TokenKindMap[r] + ")");
+    }
+}
+
+void expect(TokenKind k, TokenKind r, std::string &errormsg) {
+    if (k != r) error_exit(LexerError,errormsg);
 }
 
 void setCode() {}
@@ -144,7 +158,8 @@ void setCode() {}
 void declareVariable() {
     token = analyze();
     if (token.kind != IDENTIFIER) {
-        error_exit(SyntaxError,"\"변수\" 키위드 뒤에는 반드시 변수 이름이 와야 합니다.");
+        error_exit(SyntaxError, getCurrentLineNumber(), "'변수' 키워드 뒤에는 변수 이름이 필요합니다.\n변수 " +
+            token.text + CYAN + "\n    " + std::string(token.text.length(), '^') + RESET);
     }
 
     if (is_processing_localscope()) localVariables.push_back(token.intValue);
@@ -152,7 +167,7 @@ void declareVariable() {
 
     currentSymTbl.kind = variableID;
     currentSymTbl.name = token.text;
-    currentSymTbl.address = localVariables.size();
+    currentSymTbl.address = localVariables.size();  // "push"이므로 이 변수의 위치는 현재 LVT의 크기가 됨
 
     if (is_processing_localscope()) localSymbols.push_back(currentSymTbl);
     else globalSymbols.push_back(currentSymTbl);
@@ -160,35 +175,47 @@ void declareVariable() {
 
 // 함수 정의 처리
 void declareFunction() {
-    isProcessingFunction = true;
-    std::string function_name;
+    isProcessingFunction = true;  // 이제부터 나오는 심볼들은 LST에 들어감
 
-    token = analyze(); // 함수 키워드 스킵, 공백 스킵, 함수 이름 가져오기
+    // 시그니처 처리
+    // 함수 이름 처리
+    token = analyze(); // 함수 키워드 스킵, 공백 스킵 -> 이제 token은 함수 이름이어야 함
     expect(IDENTIFIER, token.kind);
+    currently_processing_function_addr = searchName(token.text, 'F');
 
-    function_name = token.text;
-
-    token = analyze(); // 괄호 시작
+    // 파라미터 처리
+    token = analyze();
     expect(RBRK_1, token.kind);
+
     do {
         token = analyze();
-        if (token.kind != RBRK_2) convert();
-        else break;
+
+        if (token.kind != RBRK_2) {
+            if (token.kind != COMMA) {
+                expect(IDENTIFIER, token.kind);  // 여기는 파라미터를 처리하는 부분이므로 무조건 식별자여야 함
+                convert();
+            } else {
+                // 컴마인 경우는 씹음
+            }
+        } else break;
 
     } while (token.kind != OTHERS && token.kind != EOF_TOKEN);
+
     expect(RBRK_2, token.kind);
     // 파라미터 처리 끝
 
-    // 함수 본체 처리 시작
+    // 함수 본체 처리
     token = analyze();
     expect(BRAC_1, token.kind);
+
     do {
         token = analyze();
         if (token.kind != BRAC_2) convert();
         else break;
     } while (token.kind != BRAC_2);
+
     expect(BRAC_2, token.kind);
-    isProcessingFunction = false;
+    isProcessingFunction = false;  // 함수 처리 끝
 }
 
 
@@ -228,13 +255,12 @@ void callFunction(int location) {
 
 // 주어진 토큰을 내부 코드로 변환합니다.
 // 블럭을 만나면 convert_blockSet()을 실행합니다.
-// convert_blockSet() <-> convert() 재귀적 실행
 void convert() {
     int location;
 
     currentSymTbl.clear();
 
-    if (token.kind == OTHERS) {
+    if (token.kind == NEW_LINE) {
         intercode.push_back("\n");
         return;
     }
@@ -250,14 +276,25 @@ void convert() {
             }
 
             else if ((location = searchName(token.text, 'V')) != -1) {
-                // 역
-                intercode.push_back("GVar");
-                intercode.push_back(std::to_string(location));
+                // 여기도 없을 때
+                if (is_processing_localscope()) {
+                    intercode.push_back("LVar");
+                    intercode.push_back(std::to_string(location));
+                } else {
+                    intercode.push_back("GVar");
+                    intercode.push_back(std::to_string(location));
+                }
+            }
 
+            else if (is_processing_localscope()) {
+                // 여기는 함수 파라미터인 경우임
+                globalSymbols[currently_processing_function_addr].args += 1;
             }
             break;
             // 나머지 경우에 관한 처리
-        // case WHILE: case FOR:
+        case WHILE: case FOR:
+            // TODO: while, for 구현
+            break;
         case IF:
             convert_blockSet();
             while (token.kind == ELIF) convert_blockSet();
@@ -353,7 +390,7 @@ void parseIntercode() {
             std::cout << code;
         } else if(code[0] == '[' && code[code.length()-1] == ']') {
             try {
-                tmp = stoi(code.substr(1, code.length() - 2)) -1;
+                tmp = stoi(code.substr(1, code.length() - 2));
             } catch (const std::exception &e) {
                 std::cout << code;
                 continue;
@@ -364,6 +401,8 @@ void parseIntercode() {
             std::cout << "[" << TokenKindMap[tmp] << "]";
         } else if (code == "GVar") {
             std::cout << "[GVar]";
+        } else if (code == "LVar") {
+            std::cout << "[LVar]";
         } else if (code == "CallFunc") {
             std::cout << "[CallFunc]";
         } else {

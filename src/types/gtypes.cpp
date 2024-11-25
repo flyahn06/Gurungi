@@ -13,7 +13,7 @@ KeyWord keyWordTable[] = {
         {"==", EQUAL}, {"/=", NOTEQUAL},
         {"<", LESS}, {">", GREAT},
         {"<=", LESSEQ}, {">=", GREATEQ},
-        {"\"", QUOTE}, {"\n", OTHERS}
+        {"\"", QUOTE}, {"\n", NEW_LINE}
 };
 
 std::vector<std::string> TokenKindMap = {
@@ -26,7 +26,7 @@ std::vector<std::string> TokenKindMap = {
         "FUNC", "VAR",
         "END",
         "DIGIT", "LETTER", "INTVALUE", "DOUBLEVALUE",
-        "IDENTIFIER", "NUMBER", "STRING", "OTHERS",
+        "IDENTIFIER", "NUMBER", "STRING", "OTHERS", "NEW_LINE",
         "EOF_TOKEN"
 };
 
@@ -44,14 +44,14 @@ void SymbolTable::clear() {
 }
 
 void SymbolTable::printElements() const {
-	cout
-	<< "name: " << name << endl
-	<< "kind: " << kind << endl
-	<< "type: " << type << endl
-	<< "arrayLength: " << arrayLength << endl
-	<< "args: " << args << endl
-	<< "address: " << address << endl
-	<< "frame: " << frame << endl;
+	std::cout
+	<< "name: " << name << std::endl
+	<< "kind: " << kind << std::endl
+	<< "type: " << type << std::endl
+	<< "arrayLength: " << arrayLength << std::endl
+	<< "args: " << args << std::endl
+	<< "address: " << address << std::endl
+	<< "frame: " << frame << std::endl;
 }
 
 Token token;

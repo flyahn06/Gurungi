@@ -1,6 +1,9 @@
+#ifndef _GWRAPPERS_HPP_
+#define _GWRAPPERS_HPP_
+
 #include <stack>
 #include <vector>
-#include "errors.hpp"
+#include "../Gurungi.hpp"
 
 class Gstack{
 	private:
@@ -26,3 +29,5 @@ class GMemory{
 		void push_back(double d);
 		void resize(int size);
 };
+
+#endif

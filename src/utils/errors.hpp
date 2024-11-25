@@ -1,6 +1,9 @@
+#ifndef _ERRORS_HPP_
+#define _ERRORS_HPP_
+
 #include <iostream>
 #include <string>
-#include <cstdlib>
+#include "../Gurungi.hpp"
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -20,9 +23,6 @@
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
-#ifndef _ERRORS_HPP_
-#define _ERRORS_HPP_
-
 
 class Error{
 	private:
@@ -34,7 +34,7 @@ class Error{
 		std::string getErrorName();
 };
 
-#endif
+
 
 extern Error* LexerError;
 extern Error* FuncDeclareError;
@@ -42,6 +42,13 @@ extern Error* VarDeclareError;
 extern Error* BlockNotEndedError;
 extern Error* UnexpectedTokenError;
 extern Error* SyntaxError;
+extern Error* RuntimeError;
+
 void error_exit(const std::string& msg);
 void error_exit(const std::string& tempErrorName, const std::string& msg);
 void error_exit(Error *error, const std::string& msg);
+void error_exit(int line, const std::string& msg);
+void error_exit(const std::string& tempErrorName, int line, const std::string& msg);
+void error_exit(Error *error, int line, const std::string& msg);
+
+#endif

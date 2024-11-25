@@ -1,4 +1,9 @@
-#ifndef EXECUTOR_H
-#define EXECUTOR_H
+#ifndef _EXECUTOR_HPP_
+#define _EXECUTOR_HPP_
 
-#endif //EXECUTOR_H
+#include "../Gurungi.hpp"
+
+void execute();
+void initialize_executor();
+
+#endif

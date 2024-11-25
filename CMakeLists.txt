@@ -26,6 +26,7 @@ add_executable(Gurungi
         src/lexer/lexer.cpp
         src/executor/executor.cpp
         src/executor/executor.hpp
+        src/Gurungi.hpp
 )
 
 # Set include directories

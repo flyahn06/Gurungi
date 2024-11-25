@@ -14,11 +14,12 @@ int line = 1;
 
 std::regex regAscii("[a-zA-Z0-9!?@#$%^&*():;+-=~{}<>_\\[\\]\\|\\\"\\\'\\,\\.\\/\\`\\₩]");
 std::regex regDigit("[0-9]");
-std::regex regOper(R"([\+|\-|\*|\/|<|>|=|>=|<=|==])");
+std::regex regOper(R"([\+|\-|\*|\/|<|>|=|>=|<=|==|,\.])");
 std::regex regBrac(R"([\[\]\(\)\{\}])");
 std::regex regLetter("[a-zA-Z가-힣]");
 
 // 공백 문자인지 확인
+
 bool checkIsSpace(const std::string& test) {
     return test == " " || test == "\t" || test == "\v" || test == "\f" || test == "\r";
 }
@@ -27,14 +28,22 @@ int getCurrentLineNumber() {
     return line;
 }
 
+// 연산자인지 판단합니다.
+bool isOperator(const std::string& test) {
+    return regex_match(test, regOper);
+}
+
 void resetPointer() {
     pointer = 0;
     line = 1;
 }
 
 // 전체 소스에서 다음 문자를 가져옵니다.
+
 // return: character(string)
+
 // 한글일 시 자동으로 3바이트, 다른 문자일 시 1바이트를 읽어 리턴합니다.
+
 
 std::string getNextChar() {
     // 한글인지 아닌지를 판단하는 값입니다.
@@ -63,11 +72,6 @@ std::string getNextChar() {
     return source.substr(pointer-1, 3);
 }
 
-// 연산자인지 판단합니다.
-bool isOperator(const std::string& test) {
-    return regex_match(test, regOper);
-}
-
 // 분석해 토큰을 리턴하는 함수입니다.
 // 실제로 호출되는 함수입니다.
 Token analyze() {
@@ -88,7 +92,7 @@ Token analyze() {
 	
 	if (ch == "\n") {
         line++;
-		return Token(OTHERS, "↩(새로운 줄)", 0);
+		return Token(NEW_LINE, "↩(새로운 줄)", 0);
 	}
     
     // 숫자가 있는 경우 숫자를 모두 불러와 토큰을 추출합니다.

@@ -1,10 +1,17 @@
-#include <iostream>
-#include <map>
+#ifndef _PARSER_HPP_
+#define _PARSER_HPP_
+
 #include <vector>
-#include "../lexer/lexer.hpp"
-#include "../types/gtypes.hpp"
-#include "../utils/gwrappers.hpp"
-#include "../utils/errors.hpp"
 #include <fstream>
+#include "../Gurungi.hpp"
+
+extern std::vector<int> globalVariables;
+extern std::vector<int> localVariables;
+extern std::vector<SymbolTable> globalSymbols;
+extern std::vector<SymbolTable> localSymbols;
+extern std::vector<SymbolTable> blockSymbols;
+extern std::vector<std::string> intercode;
 
 void parseIntercode();
+
+#endif

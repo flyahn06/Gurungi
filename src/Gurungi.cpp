@@ -1,9 +1,8 @@
 #include <iostream>
 #include <string>
-#include "lexer/lexer.hpp"
-#include "utils/errors.hpp"
-#include "parser/parser.hpp"
-#include "arg_parser/arg_parser.hpp"
+#include "Gurungi.hpp"
+
+std::string filename;
 
 int main(int argc, char* args[]) {
 
@@ -11,7 +10,7 @@ int main(int argc, char* args[]) {
 		error_exit("파일 이름이 없습니다. 자세한 내용은 \"Gurungi --도움\"을 참조하세요!");
 	}
 	
-	std::string filename = args[1];
+	filename = args[1];
     std::fstream fin;
 
     fin.open(filename);
@@ -31,6 +30,11 @@ int main(int argc, char* args[]) {
 	resetPointer();
 	std::cout << "파싱중입니다..." << std::endl;
 	parseIntercode();
+	std::cout << "파싱을 마쳤습니다. " << std::endl;
+
+	std::cout << "실행을 시작합니다." << std::endl;
+	initialize_executor();
+	execute();
 
 	return 0;
 }

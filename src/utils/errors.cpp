@@ -6,6 +6,7 @@ Error* VarDeclareError = new Error("변수 정의 오류");
 Error* BlockNotEndedError = new Error("블럭 정의 오류");
 Error* UnexpectedTokenError = new Error("파싱 오류");
 Error* SyntaxError = new Error("문법 오류");
+Error* RuntimeError = new Error("런타임 오류");
 
 std::string Error::getErrorName() {
 	return errorName;
@@ -33,6 +34,24 @@ void error_exit(const std::string& tempErrorName, const std::string& msg) {
 
 void error_exit(Error *error, const std::string& msg) {
 	std::cerr << RED << error->getErrorName() << RESET << ": "
+		 << msg << std::endl;
+	exit(1);
+}
+
+void error_exit(const int line, const std::string& msg) {
+	std::cerr << RED << filename << ":" << line << RESET << ": "
+		 << msg << std::endl;
+	exit(1);
+}
+
+void error_exit(const std::string& tempErrorName, const int line, const std::string& msg) {
+	std::cerr << RED << filename << ":" << line << ": " << tempErrorName << RESET << ": "
+		 << msg << std::endl;
+	exit(1);
+}
+
+void error_exit(Error *error, const int line, const std::string& msg) {
+	std::cerr << RED << filename << ":" << line << ": " << error->getErrorName() << RESET << ": "
 		 << msg << std::endl;
 	exit(1);
 }
