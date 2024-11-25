@@ -1,7 +1,5 @@
 #include "gtypes.hpp"
 
-using namespace std;
-
 KeyWord keyWordTable[] = {
         {"만약", IF}, {"아니라면", ELSE},
         {"끝", END}, {"출력", PRINT},
@@ -18,7 +16,7 @@ KeyWord keyWordTable[] = {
         {"\"", QUOTE}, {"\n", OTHERS}
 };
 
-vector<string> TokenKindMap = {
+std::vector<std::string> TokenKindMap = {
         "RBRK_1", "RBRK_2", "BRAC_1", "BRAC_2", "SBRK_1", "SBRK_2",
         "PLUS", "MINUS", "STAR", "SLASH",
         "LESS", "LESSEQ", "GREAT", "GREATEQ", "EQUAL", "NOTEQUAL",

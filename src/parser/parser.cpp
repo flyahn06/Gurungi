@@ -1,14 +1,12 @@
 #include "parser.hpp"
 
-using namespace std;
-
-vector<int> globalVariables;
-vector<int> localVariables;
-vector<SymbolTable> globalSymbols;
-vector<SymbolTable> localSymbols;
-vector<SymbolTable> blockSymbols;
+std::vector<int> globalVariables;
+std::vector<int> localVariables;
+std::vector<SymbolTable> globalSymbols;
+std::vector<SymbolTable> localSymbols;
+std::vector<SymbolTable> blockSymbols;
 GMemory DMemory;
-vector<string> intercode;
+std::vector<std::string> intercode;
 SymbolTable currentSymTbl;
 
 void convert_blockSet();
@@ -21,7 +19,7 @@ int localAddress = 0;
 void convert();
 void printAllTables();
 void expect(TokenKind, TokenKind);
-void expect(TokenKind, TokenKind, const string&);
+void expect(TokenKind, TokenKind, const std::string&);
 
 // 함수의 이름을 등록하는 함수입니다. 키워드 "함수" 뒤에 함수 이름이 나오지 않으면 오류를 발생시킵니다.
 void set_name() {
@@ -40,7 +38,7 @@ bool is_processing_localscope() {
 }
 
 // 식별자의 이름이 로컬 영역에서 사용하는지 글로벌 영역에서 사용하는지를 판단하는 함수입니다.
-bool is_localname(const string& name, SymbolKind kind) {
+bool is_localname(const std::string& name, SymbolKind kind) {
     // 파라미터면 무조건 로컬영역에서 사용됩니다.
     if (kind == parameterID) return true;
 
@@ -133,13 +131,11 @@ int enter(SymbolTable& table, SymbolKind kind) {
 }
 
 // 현재 토큰을 assert합니다.
-void expect(TokenKind k, TokenKind r, const string& errormsg) {
-    cout << "k: " << k << "\t\tr: " << r << endl;
+void expect(TokenKind k, TokenKind r, const std::string& errormsg) {
     if (k != r) error_exit(errormsg);
 }
 
 void expect(TokenKind k, TokenKind r) {
-    cout << "k: " << k << "\t\tr: " << r << endl;
     if (k != r) error_exit(LexerError,"오류: 토큰의 기댓값이 일치하지 않습니다.");
 }
 
@@ -151,8 +147,8 @@ void declareVariable() {
         error_exit(SyntaxError,"\"변수\" 키위드 뒤에는 반드시 변수 이름이 와야 합니다.");
     }
 
-    localVariables.push_back(token.intValue);
-
+    if (is_processing_localscope()) localVariables.push_back(token.intValue);
+    else globalVariables.push_back(token.intValue);
 
     currentSymTbl.kind = variableID;
     currentSymTbl.name = token.text;
@@ -160,13 +156,12 @@ void declareVariable() {
 
     if (is_processing_localscope()) localSymbols.push_back(currentSymTbl);
     else globalSymbols.push_back(currentSymTbl);
-    cout << "변수 선언 성공: " << token.text << endl;
 }
 
 // 함수 정의 처리
 void declareFunction() {
     isProcessingFunction = true;
-    string function_name;
+    std::string function_name;
 
     token = analyze(); // 함수 키워드 스킵, 공백 스킵, 함수 이름 가져오기
     expect(IDENTIFIER, token.kind);
@@ -222,17 +217,13 @@ void convert_blockSet() {
     }
 
     expect(BRAC_2, token.kind, "블럭이 끝나지 않았습니다. " + token.text);
-
-
-    cout << "CVBLKSET_END" << endl;
 }
 
 void setCodeEnd() {}
 
 void callFunction(int location) {
-    cout << "함수 실행!" << location << endl;
     intercode.push_back("CallFunc");
-    intercode.push_back(to_string(location));
+    intercode.push_back(std::to_string(location));
 }
 
 // 주어진 토큰을 내부 코드로 변환합니다.
@@ -241,12 +232,10 @@ void callFunction(int location) {
 void convert() {
     int location;
 
-    cout << endl << ">>> convert 호출됨: " << token.text << " <<<" << endl;
     currentSymTbl.clear();
 
     if (token.kind == OTHERS) {
         intercode.push_back("\n");
-        cout << "토큰 스킵" << endl;
         return;
     }
 
@@ -257,15 +246,13 @@ void convert() {
             if ((location = searchName(token.text, 'F')) != -1) {
                 // 함수 호출인 경우(좀 꼬임)
                 // = 만약 모든 테이블에서 변수인 이름이 없는 경우
-                cout << "Callfunction" << endl;
                 callFunction(location);
             }
 
             else if ((location = searchName(token.text, 'V')) != -1) {
                 // 역
-                cout << "변수 찾음@" << location << endl;
                 intercode.push_back("GVar");
-                intercode.push_back(to_string(location));
+                intercode.push_back(std::to_string(location));
 
             }
             break;
@@ -279,52 +266,47 @@ void convert() {
             break;
             case PLUS: case MINUS: case STAR: case SLASH: case LESS: case LESSEQ: case GREAT: case GREATEQ:
             case EQUAL: case NOTEQUAL: case ASSIGN: case COMMA: case DOT: case QUOTE: case RBRK_1: case RBRK_2:
-                    intercode.push_back("[" + to_string(token.kind) + "]");
+                    intercode.push_back("[" + std::to_string(token.kind) + "]");
                 break;
         case NUMBER:
-            intercode.push_back("[" + to_string(NUMBER) + "]");
-            intercode.push_back(to_string(token.intValue));
+            intercode.push_back("[" + std::to_string(NUMBER) + "]");
+            intercode.push_back(std::to_string(token.intValue));
             break;
         case STRING:
-            intercode.push_back("[" + to_string(STRING) + "]");
+            intercode.push_back("[" + std::to_string(STRING) + "]");
             intercode.push_back(token.text);
             break;
         case PRINT:
-            intercode.push_back("[" + to_string(PRINT) + "]");
+            intercode.push_back("[" + std::to_string(PRINT) + "]");
             break;
         case EOF_TOKEN:
-            cout << "파싱 작업이 끝났습니다." << endl;
+            std::cout << "파싱 작업이 끝났습니다." << std::endl;
             break;
-
-        default:
-            cout << RED << "! 마땅한 동작 하지 않음" << RESET << endl;
     }
 }
 
 void printAllTables() {
-
-    cout << "globalSymbols:" << endl;
+    std::cout << "globalSymbols:" << std::endl;
     for (auto & globalSymbol : globalSymbols) {
-        cout << "\t" << globalSymbol.name << "(" << globalSymbol.kind << ")" << endl;
+        std::cout << "\t" << globalSymbol.name << "(" << globalSymbol.kind << ")" << std::endl;
     }
 
-
-    cout << "localSymbols:" << endl;
+    std::cout << "localSymbols:" << std::endl;
     for (auto & localSymbol : localSymbols) {
-        cout << "\t" << localSymbol.name << "(" << localSymbol.kind << ")" << endl;
+        std::cout << "\t" << localSymbol.name << "(" << localSymbol.kind << ")" << std::endl;
     }
 
-
-    cout << "globalVariables:" << endl;
+    std::cout << "globalVariables:" << std::endl;
     for (int globalVariable : globalVariables) {
-        cout << "\t" << globalVariable << " ";
+        std::cout << "\t" << globalVariable << " ";
     }
+    std::cout << std::endl;
 
-
-    cout << "localVariables: " << endl;
+    std::cout << "localVariables: " << std::endl;
     for (int localVariable : localVariables) {
-        cout << "\t" << localVariable << " ";
+        std::cout << "\t" << localVariable << " ";
     }
+    std::cout << std::endl;
 }
 
 void parseIntercode() {
@@ -349,47 +331,45 @@ void parseIntercode() {
         convert();
         token = analyze();
     }
-//    cout << RED << "!important: " << token.kind << endl;
-//
-//    for (auto & globalSymbol : globalSymbols) {
-//        globalSymbol.printElements();
-//    }
+
+
+    // ------------------------------------------------------------
 
     bool isLiteral = false;
     int tmp;
-    int line=1;
+    int line = 1;
 
     for (auto & code : intercode) {
-        cout << " ";
+        std::cout << " ";
 
         if (code == "\n") {
-            cout << "\nln " << line << ":";
+            std::cout << "\nln " << line << ":";
             line++;
             continue;
         }
 
         if(isLiteral) {
             isLiteral = false;
-            cout << code;
+            std::cout << code;
         } else if(code[0] == '[' && code[code.length()-1] == ']') {
             try {
                 tmp = stoi(code.substr(1, code.length() - 2)) -1;
-            } catch (const exception &e) {
-                cout << code;
+            } catch (const std::exception &e) {
+                std::cout << code;
                 continue;
             }
             if (tmp == NUMBER || tmp == STRING) {
                 isLiteral = true;
             }
-            cout << "[" << TokenKindMap[tmp] << "]";
+            std::cout << "[" << TokenKindMap[tmp] << "]";
         } else if (code == "GVar") {
-            cout << "[GVar]";
+            std::cout << "[GVar]";
         } else if (code == "CallFunc") {
-            cout << "[CallFunc]";
+            std::cout << "[CallFunc]";
         } else {
-            cout << code;
+            std::cout << code;
         }
     }
-    cout << endl;
+    std::cout << std::endl;
     printAllTables();
 }
